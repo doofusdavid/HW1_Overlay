@@ -7,14 +7,14 @@ import java.io.*;
  */
 public class Deregister implements Event
 {
-    public int type;
+    public int type = MessageType.DEREGISTER_REQUEST;
     public String IPAddress;
     public int Port;
 
     @Override
     public int getType()
     {
-        return 0;
+        return this.type;
     }
 
     @Override
