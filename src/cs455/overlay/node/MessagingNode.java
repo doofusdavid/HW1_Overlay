@@ -7,6 +7,7 @@ import cs455.overlay.wireformats.RegisterRequest;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -103,12 +104,14 @@ public class MessagingNode implements Node
     public MessagingNode(String registryIPAddress, int registryPort)
     {
         this.registryIPAddress = registryIPAddress;
+        // Debugging
+
         this.registryPort = registryPort;
 
-        try (Socket socket = new Socket(InetAddress.getLocalHost(), 0))
+        try
         {
-            TCPReceiverThread receiver = new TCPReceiverThread(socket.getPort());
-            this.hostPort = socket.getPort();
+            TCPReceiverThread receiver = new TCPReceiverThread(0);
+            this.hostPort = receiver.getPort();
             this.hostIPAddress = InetAddress.getLocalHost().toString();
             receiver.run();
         }
@@ -120,7 +123,6 @@ public class MessagingNode implements Node
         {
             System.out.println(ie.getMessage());
         }
-
 
         try
         {

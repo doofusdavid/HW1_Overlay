@@ -4,6 +4,10 @@ import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.IPChecker;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 /**
@@ -14,6 +18,7 @@ public class Registry implements Node
     private TCPReceiverThread receiver;
     private TCPSender sender;
     private int registryPort;
+    private String registryIPAddress;
 
     public static void main(String[] args)
     {
@@ -38,7 +43,16 @@ public class Registry implements Node
         // Instantiate our registry.
         Registry registry = new Registry(argPort);
 
-        System.out.println("Registry Started and awaiting orders.");
+        String registryIP="";
+        try{
+            registryIP = InetAddress.getLocalHost().getHostAddress().toString();
+        }
+        catch (UnknownHostException e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println(String.format("Registry Started and awaiting orders on port %d and IP address %s.", registry.registryPort, registryIP));
 
         ProcessInput();
 
@@ -115,6 +129,22 @@ public class Registry implements Node
     public Registry(int port)
     {
         this.registryPort = port;
+
+        try
+        {
+            TCPReceiverThread receiver = new TCPReceiverThread(this.registryPort);
+            this.registryIPAddress = InetAddress.getLocalHost().getHostAddress().toString();
+            receiver.run();
+        }
+        catch (UnknownHostException ue)
+        {
+            System.out.println(ue.getMessage());
+        }
+        catch (IOException ie)
+        {
+            System.out.println(ie.getMessage());
+        }
+
     }
 
 

@@ -40,6 +40,10 @@ public class TCPReceiverThread implements Runnable
         }
     }
 
+    public int getPort()
+    {
+        return this.port;
+    }
     @Override
     public void run()
     {
