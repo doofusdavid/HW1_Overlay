@@ -41,6 +41,7 @@ public class Registry implements Node
         System.out.println("Registry Started and awaiting orders.");
 
         ProcessInput();
+
         return;
     }
 

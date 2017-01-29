@@ -3,6 +3,7 @@ package cs455.overlay.node;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.IPChecker;
+import cs455.overlay.wireformats.RegisterRequest;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -22,8 +23,14 @@ public class MessagingNode implements Node
     private String registryIPAddress;
     private int registryPort;
 
-    private int receivedMessageCount;
-    private int sentMessageCount;
+    // keep track of number of messages sent/receive by this node
+    private int receiveTracker;
+    private int sendTracker;
+
+    // keep track of the sum of the random numbers sent
+    private long sendSummation;
+    private long receiveSummation;
+
 
     @Override
     public void onEvent()
@@ -93,14 +100,16 @@ public class MessagingNode implements Node
     }
 
 
-    MessagingNode(String registryIPAddress, int registryPort)
+    public MessagingNode(String registryIPAddress, int registryPort)
     {
         this.registryIPAddress = registryIPAddress;
         this.registryPort = registryPort;
 
-        try (Socket socket = new Socket(InetAddress.getLocalHost(), 1000))
+        try (Socket socket = new Socket(InetAddress.getLocalHost(), 0))
         {
-            receiver = new TCPReceiverThread(0);
+            TCPReceiverThread receiver = new TCPReceiverThread(socket.getPort());
+            this.hostPort = socket.getPort();
+            this.hostIPAddress = InetAddress.getLocalHost().toString();
             receiver.run();
         }
         catch (UnknownHostException ue)
@@ -112,8 +121,23 @@ public class MessagingNode implements Node
             System.out.println(ie.getMessage());
         }
 
+
+        try
+        {
+            Socket registrySocket = new Socket(this.registryIPAddress, this.registryPort);
+            TCPSender sender = new TCPSender(registrySocket);
+            RegisterRequest registerRequestMessage = new RegisterRequest();
+            registerRequestMessage.IPAddress = this.hostIPAddress;
+            registerRequestMessage.Port = this.hostPort;
+
+            sender.sendData(registerRequestMessage.getBytes());
+
+        } catch (IOException ioe)
+        {
+            System.out.println(ioe.getMessage());
+        }
         // Connect to Registry
-        // Register self
+        // RegisterRequest self
 
 
     }
@@ -123,10 +147,18 @@ public class MessagingNode implements Node
      */
     private synchronized void incrementSentCounter()
     {
-        this.sentMessageCount++;
+        this.sendTracker++;
     }
     private synchronized void incrementReceivedCounter()
     {
-        this.receivedMessageCount++;
+        this.receiveTracker++;
+    }
+    private synchronized void addReceiveSummation(int value)
+    {
+        this.receiveSummation += value;
+    }
+    private synchronized void addSentSummation(int value)
+    {
+        this.sendSummation += value;
     }
 }

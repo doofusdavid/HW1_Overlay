@@ -1,6 +1,8 @@
 package cs455.overlay.transport;
 
-import com.sun.corba.se.spi.activation.Server;
+import cs455.overlay.wireformats.Deregister;
+import cs455.overlay.wireformats.MessageType;
+import cs455.overlay.wireformats.RegisterRequest;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -42,6 +44,7 @@ public class TCPReceiverThread implements Runnable
     public void run()
     {
         int dataLength;
+        int messageType;
 
         while(true)
         {
@@ -53,9 +56,12 @@ public class TCPReceiverThread implements Runnable
                     try
                     {
                         dataLength = din.readInt();
+                        messageType = din.readInt();
 
                         byte[] data = new byte[dataLength];
                         din.readFully(data, 0, dataLength);
+                        ProcessInput(data, messageType);
+
                     } catch (SocketException se)
                     {
                         System.out.println(se.getMessage());
@@ -67,6 +73,28 @@ public class TCPReceiverThread implements Runnable
                 System.out.println(ie.getMessage());
                 break;
             }
+        }
+    }
+
+    private void ProcessInput(byte[] data, int messageType)
+    {
+        try
+        {
+            switch (messageType)
+            {
+                case MessageType.REGISTER_REQUEST:
+                {
+                    RegisterRequest message = new RegisterRequest(data);
+                }
+                case MessageType.DEREGISTER_REQUEST:
+                {
+                    Deregister message = new Deregister(data);
+                    break;
+                }
+            }
+        } catch (IOException ioe)
+        {
+            System.out.println(ioe.getMessage());
         }
     }
 }
