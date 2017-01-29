@@ -5,9 +5,9 @@ import java.io.*;
 /**
  *  Upon starting up, nodes register themselves with the Registry using this format.
  */
-public class Register implements Event
+public class RegisterRequest implements Event
 {
-    public int type;
+    private int type;
     public String IPAddress;
     public int Port;
 
@@ -41,7 +41,12 @@ public class Register implements Event
         return marshalledBytes;
     }
 
-    public Register(byte[] marshalledBytes) throws IOException
+    public RegisterRequest()
+    {
+        this.type = MessageType.REGISTER_REQUEST;
+    }
+
+    public RegisterRequest(byte[] marshalledBytes) throws IOException
     {
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
