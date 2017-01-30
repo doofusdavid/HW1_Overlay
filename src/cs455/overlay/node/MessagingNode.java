@@ -113,7 +113,10 @@ public class MessagingNode implements Node
             TCPReceiverThread receiver = new TCPReceiverThread(0);
             this.hostPort = receiver.getPort();
             this.hostIPAddress = InetAddress.getLocalHost().toString();
-            receiver.run();
+            Thread t = new Thread(receiver);
+            t.start();
+            System.out.println(String.format("Messaging Node: %d started TCPReceiverThread",this.hostPort));
+            //receiver.run();
         }
         catch (UnknownHostException ue)
         {
@@ -126,6 +129,7 @@ public class MessagingNode implements Node
 
         try
         {
+            System.out.println(String.format("Attempting to connect to registry at: %s:%d", this.registryIPAddress, this.registryPort));
             Socket registrySocket = new Socket(this.registryIPAddress, this.registryPort);
             TCPSender sender = new TCPSender(registrySocket);
             RegisterRequest registerRequestMessage = new RegisterRequest();

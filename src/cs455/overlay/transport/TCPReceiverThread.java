@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
 
 /**
  * Created by david on 1/21/17.
@@ -16,6 +17,7 @@ import java.net.SocketException;
 public class TCPReceiverThread implements Runnable
 {
     private ServerSocket serverSocket;
+    private Socket socket;
     private int port;
     private DataInputStream din;
 
@@ -33,6 +35,8 @@ public class TCPReceiverThread implements Runnable
             // Passing a 0 auto-allocates a port
             this.serverSocket = new ServerSocket(port);
             this.port = this.serverSocket.getLocalPort();
+
+            System.out.println(String.format("TCPReceiverThread running on %s", this.serverSocket.getInetAddress().toString()));
         }
         catch (IOException ioe)
         {
@@ -59,12 +63,13 @@ public class TCPReceiverThread implements Runnable
                 {
                     try
                     {
+                        din = new DataInputStream(socket.getInputStream());
                         dataLength = din.readInt();
-                        messageType = din.readInt();
+                        //messageType = din.readInt();
 
                         byte[] data = new byte[dataLength];
                         din.readFully(data, 0, dataLength);
-                        ProcessInput(data, messageType);
+                        ProcessInput(data);
 
                     } catch (SocketException se)
                     {
@@ -80,15 +85,22 @@ public class TCPReceiverThread implements Runnable
         }
     }
 
-    private void ProcessInput(byte[] data, int messageType)
+    private void ProcessInput(byte[] data)
     {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(data);
+
+        // The length has been trimmed off, so we're just going to start with messageType
+        int messageType = byteBuffer.getInt();
+
         try
         {
+
             switch (messageType)
             {
                 case MessageType.REGISTER_REQUEST:
                 {
                     RegisterRequest message = new RegisterRequest(data);
+                    break;
                 }
                 case MessageType.DEREGISTER_REQUEST:
                 {

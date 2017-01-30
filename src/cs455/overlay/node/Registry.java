@@ -134,7 +134,10 @@ public class Registry implements Node
         {
             TCPReceiverThread receiver = new TCPReceiverThread(this.registryPort);
             this.registryIPAddress = InetAddress.getLocalHost().getHostAddress().toString();
-            receiver.run();
+            //receiver.run();
+            Thread t = new Thread(receiver);
+            t.start();
+            System.out.println("Registry TCPReceiverThread running.");
         }
         catch (UnknownHostException ue)
         {
