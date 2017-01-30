@@ -2,13 +2,17 @@ package cs455.overlay.node;
 
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
-import cs455.overlay.util.IPChecker;
+import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.RegisterRequest;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+
+import static java.lang.System.in;
 
 /**
  * Created by david on 1/21/17.
@@ -19,6 +23,7 @@ public class Registry implements Node
     private TCPSender sender;
     private int registryPort;
     private String registryIPAddress;
+    private ArrayList<Integer> nodeList;
 
     public static void main(String[] args)
     {
@@ -54,12 +59,12 @@ public class Registry implements Node
 
         System.out.println(String.format("Registry Started and awaiting orders on port %d and IP address %s.", registry.registryPort, registryIP));
 
-        ProcessInput();
+        ProcessInput(registry);
 
         return;
     }
 
-    private static void ProcessInput()
+    private static void ProcessInput(Registry registry)
     {
         Scanner in = new Scanner(System.in);
         while(true)
@@ -104,9 +109,7 @@ public class Registry implements Node
             switch (input)
             {
                 case "list-messaging-nodes":
-                    System.out.println("Received List Messaging Nodes command");
-
-                    // List Messaging nodes
+                    registry.ListMessagingNodes();
 
                     break;
                 case "list-weights":
@@ -126,13 +129,31 @@ public class Registry implements Node
         }
     }
 
+    private void ListMessagingNodes()
+    {
+        if(this.nodeList.size() == 0)
+        {
+            System.out.println("list-messaging-nodes: There are no registered Messaging Nodes");
+        }
+        else
+        {
+            System.out.println(String.format("list-messaging-nodes: There are %d total registered Messaging Nodes", this.nodeList.size()));
+            for(Integer item : this.nodeList)
+            {
+                System.out.println(String.format("list-messaging-nodes: Node registered at port %d", item));
+            }
+        }
+
+
+    }
     public Registry(int port)
     {
         this.registryPort = port;
+        this.nodeList = new ArrayList<Integer>();
 
         try
         {
-            TCPReceiverThread receiver = new TCPReceiverThread(this.registryPort);
+            TCPReceiverThread receiver = new TCPReceiverThread(this.registryPort, this);
             this.registryIPAddress = InetAddress.getLocalHost().getHostAddress().toString();
             //receiver.run();
             Thread t = new Thread(receiver);
@@ -152,8 +173,12 @@ public class Registry implements Node
 
 
     @Override
-    public void onEvent()
+    public void onEvent(Event event)
     {
-
+        if(event instanceof RegisterRequest)
+        {
+            System.out.println("Register Request Fired");
+            this.nodeList.add(((RegisterRequest) event).Port);
+        }
     }
 }

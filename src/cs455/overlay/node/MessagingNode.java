@@ -3,6 +3,7 @@ package cs455.overlay.node;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.IPChecker;
+import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.RegisterRequest;
 
 import java.io.IOException;
@@ -31,12 +32,6 @@ public class MessagingNode implements Node
     // keep track of the sum of the random numbers sent
     private long sendSummation;
     private long receiveSummation;
-
-
-    @Override
-    public void onEvent()
-    {
-    }
 
     public static void main(String[] args)
     {
@@ -110,13 +105,12 @@ public class MessagingNode implements Node
 
         try
         {
-            TCPReceiverThread receiver = new TCPReceiverThread(0);
+            TCPReceiverThread receiver = new TCPReceiverThread(0, this);
             this.hostPort = receiver.getPort();
             this.hostIPAddress = InetAddress.getLocalHost().toString();
             Thread t = new Thread(receiver);
             t.start();
             System.out.println(String.format("Messaging Node: %d started TCPReceiverThread",this.hostPort));
-            //receiver.run();
         }
         catch (UnknownHostException ue)
         {
@@ -166,5 +160,11 @@ public class MessagingNode implements Node
     private synchronized void addSentSummation(int value)
     {
         this.sendSummation += value;
+    }
+
+    @Override
+    public void onEvent(Event event)
+    {
+
     }
 }
