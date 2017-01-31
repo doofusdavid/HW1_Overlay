@@ -4,9 +4,12 @@ import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.RegisterRequest;
+import cs455.overlay.wireformats.RegisterResponse;
+import cs455.overlay.wireformats.StatusCode;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -167,7 +170,32 @@ public class Registry implements Node
         if(event instanceof RegisterRequest)
         {
             System.out.println("Register Request Fired");
-            this.nodeList.add(((RegisterRequest) event).Port);
+            AddNodeToGraph(((RegisterRequest) event).IPAddress, ((RegisterRequest) event).Port);
+        }
+    }
+
+
+    public void AddNodeToGraph(String IPAddress, int port)
+    {
+        this.nodeList.add(port);
+        SendRegisterResponse(IPAddress, port, StatusCode.SUCCESS);
+    }
+
+    public void SendRegisterResponse(String nodeIpAddress, int nodePort, byte statusCode)
+    {
+        try
+        {
+            Socket socket = new Socket(nodeIpAddress, nodePort);
+            TCPSender sender = new TCPSender(socket);
+            RegisterResponse message = new RegisterResponse();
+
+            message.statusCode = statusCode;
+            message.additionalInfo = "Welcome to the network";
+            sender.sendData(message.getBytes());
+
+        } catch (IOException e)
+        {
+           System.out.println(e.getMessage());
         }
     }
 }

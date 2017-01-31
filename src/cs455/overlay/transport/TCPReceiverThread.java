@@ -63,7 +63,8 @@ public class TCPReceiverThread implements Runnable
 
                         byte[] data = new byte[dataLength];
                         din.readFully(data, 0, dataLength);
-                        EventFactory.FireEvent(data, this.node);
+                        EventFactory ef = EventFactory.getInstance();
+                        ef.FireEvent(data, this.node);
                         socket = null;
                     } catch (SocketException se)
                     {

@@ -48,7 +48,6 @@ public class RegisterRequest implements Event
 
     public RegisterRequest(byte[] marshalledBytes) throws IOException
     {
-        this();
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
 

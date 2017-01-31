@@ -19,7 +19,7 @@ public class EventFactory
     {
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
 
-        // The length has been trimmed off, so we're just going to start with messageType
+        // The length has already been trimmed off, so we're just going to start with messageType
         int messageType = byteBuffer.getInt();
 
         try
@@ -30,6 +30,11 @@ public class EventFactory
                 case MessageType.REGISTER_REQUEST:
                 {
                     message = new RegisterRequest(data);
+                    break;
+                }
+                case MessageType.REGISTER_RESPONSE:
+                {
+                    message = new RegisterResponse(data);
                     break;
                 }
                 case MessageType.DEREGISTER_REQUEST:

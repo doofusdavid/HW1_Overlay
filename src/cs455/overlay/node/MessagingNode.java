@@ -103,7 +103,7 @@ public class MessagingNode implements Node
         {
             TCPReceiverThread receiver = new TCPReceiverThread(0, this);
             this.hostPort = receiver.getPort();
-            this.hostIPAddress = InetAddress.getLocalHost().toString();
+            this.hostIPAddress = InetAddress.getLocalHost().getHostAddress();
             Thread t = new Thread(receiver);
             t.start();
             System.out.println(String.format("Messaging Node: %d started TCPReceiverThread",this.hostPort));
