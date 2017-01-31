@@ -2,6 +2,8 @@ package cs455.overlay.node;
 
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
+import cs455.overlay.util.NotImplementedException;
+import cs455.overlay.wireformats.*;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.RegisterRequest;
 import cs455.overlay.wireformats.RegisterResponse;
@@ -14,6 +16,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Created by david on 1/21/17.
+ */
 public class Registry implements Node
 {
     private TCPReceiverThread receiver;
@@ -110,14 +115,15 @@ public class Registry implements Node
                     break;
                 case "list-weights":
                     System.out.println("Received List Weights command");
-
+                    throw new NotImplementedException();
                     // List Weights
-                    break;
+                    //break;
                 case "send-overlay-link-weights":
                     System.out.println("Received Send Overlay Link Weights command");
+                    throw new NotImplementedException();
 
                     // Send Overlay Link Weights
-                    break;
+                    //break;
                 default:
                     System.out.println("Unknown command.\nKnown commands are print-shortest-path and exit-overlay");
                     break;
@@ -139,9 +145,8 @@ public class Registry implements Node
                 System.out.println(String.format("list-messaging-nodes: Node registered at port %d", item));
             }
         }
-
-
     }
+
     private Registry(int port)
     {
         this.registryPort = port;
@@ -160,9 +165,43 @@ public class Registry implements Node
         {
             System.out.println(e.getMessage());
         }
-
     }
 
+    public void RegisterNode(RegisterRequest request)
+    {
+        System.out.println("Register Request Fired");
+        if(this.nodeList.contains(request.Port))
+        {
+            // Node already registered, send a Failure response
+            this.SendRegistrationResponse(request, StatusCode.FAILURE, "Node already registered.  No action taken");
+        }
+        else
+        {
+            // Add the port and send an affirmative response.
+            this.nodeList.add(request.Port);
+            this.SendRegistrationResponse(request, StatusCode.SUCCESS, "Node Registered");
+        }
+    }
+
+    private void SendRegistrationResponse(RegisterRequest request, byte status, String message)
+    {
+        try
+        {
+            System.out.println(String.format("Sending Registration Response to %s:%d", request.IPAddress, request.Port));
+            Socket socket = new Socket(request.IPAddress, request.Port);
+            TCPSender sender = new TCPSender(socket);
+
+            RegisterResponse response = new RegisterResponse();
+            response.statusCode = status;
+            response.additionalInfo = message;
+
+            sender.sendData(response.getBytes());
+
+        } catch (IOException ioe)
+        {
+            System.out.println(ioe.getMessage());
+        }
+    }
 
     @Override
     public void onEvent(Event event)

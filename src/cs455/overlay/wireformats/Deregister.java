@@ -7,7 +7,7 @@ import java.io.*;
  */
 public class Deregister implements Event
 {
-    public int type = MessageType.DEREGISTER_REQUEST;
+    private int type;
     public String IPAddress;
     public int Port;
 
@@ -58,5 +58,10 @@ public class Deregister implements Event
 
         baInputStream.close();
         din.close();
+    }
+
+    public Deregister()
+    {
+        this.type = MessageType.DEREGISTER_REQUEST;
     }
 }

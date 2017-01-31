@@ -3,8 +3,8 @@ package cs455.overlay.node;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.IPChecker;
-import cs455.overlay.wireformats.Event;
-import cs455.overlay.wireformats.RegisterRequest;
+import cs455.overlay.util.NotImplementedException;
+import cs455.overlay.wireformats.*;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -21,6 +21,7 @@ public class MessagingNode implements Node
     private int hostPort;
     private String registryIPAddress;
     private int registryPort;
+    private boolean connectedToRegistry;
 
     // keep track of number of messages sent/receive by this node
     private int receiveTracker;
@@ -62,10 +63,10 @@ public class MessagingNode implements Node
 
         System.out.println("Node Started and awaiting orders.");
 
-        ProcessInput();
+        ProcessInput(node);
     }
 
-    private static void ProcessInput()
+    private static void ProcessInput(MessagingNode node)
     {
         Scanner in = new Scanner(System.in);
         while(true)
@@ -75,10 +76,12 @@ public class MessagingNode implements Node
             {
                 case "print-shortest-path":
                     System.out.println("Received Print Shortest Path command");
-                    break;
+                    throw new NotImplementedException();
+                    //break;
                 case "exit-overlay":
                     System.out.println("Received Exit Overlay command");
 
+                    node.SendExitOverlay();
                     // Send deregistration message to registry
                     // await response
                     // exit and terminate process
@@ -95,9 +98,8 @@ public class MessagingNode implements Node
     private MessagingNode(String registryIPAddress, int registryPort)
     {
         this.registryIPAddress = registryIPAddress;
-        // Debugging
-
         this.registryPort = registryPort;
+        this.connectedToRegistry = false;
 
         try
         {
@@ -113,6 +115,13 @@ public class MessagingNode implements Node
             System.out.println(e.getMessage());
         }
 
+        // Connect to Registry
+        this.SendRegistrationRequest();
+
+    }
+
+    private void SendRegistrationRequest()
+    {
         try
         {
             System.out.println(String.format("Attempting to connect to registry at: %s:%d", this.registryIPAddress, this.registryPort));
@@ -127,12 +136,42 @@ public class MessagingNode implements Node
         {
             System.out.println(ioe.getMessage());
         }
-        // Connect to Registry
-        // RegisterRequest self
-
-
     }
 
+    private void SendExitOverlay()
+    {
+        try
+        {
+            System.out.println(String.format("Attempting to send exit registry at: %s:%d", this.registryIPAddress, this.registryPort));
+            Socket registrySocket = new Socket(this.registryIPAddress, this.registryPort);
+            TCPSender sender = new TCPSender(registrySocket);
+            Deregister deregisterMessage = new Deregister();
+            deregisterMessage.Port = this.hostPort;
+            deregisterMessage.IPAddress = this.hostIPAddress;
+
+            sender.sendData(deregisterMessage.getBytes());
+
+        } catch (IOException ioe)
+        {
+            System.out.println(ioe.getMessage());
+        }
+    }
+
+    private void ReceiveRegistrationResponse(RegisterResponse response)
+    {
+        if(response.statusCode== StatusCode.FAILURE)
+        {
+            System.out.println("Registration Request Failed.  Exiting.");
+            System.out.println(String.format("Message: %s", response.additionalInfo));
+            System.exit(0);
+        }
+        else
+        {
+            System.out.println("Registration Request Succeeded.");
+            System.out.println(String.format("Message: %s", response.additionalInfo));
+            this.connectedToRegistry = true;
+        }
+    }
     /**
      * Create this as synchronized so that two threads can't update the counter simultaneously.
      */
@@ -156,6 +195,9 @@ public class MessagingNode implements Node
     @Override
     public void onEvent(Event event)
     {
-
+        if(event instanceof RegisterResponse)
+        {
+            this.ReceiveRegistrationResponse((RegisterResponse) event);
+        }
     }
 }
