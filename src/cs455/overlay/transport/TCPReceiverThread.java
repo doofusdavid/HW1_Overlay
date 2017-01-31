@@ -1,18 +1,14 @@
 package cs455.overlay.transport;
 
 import cs455.overlay.node.Node;
-import cs455.overlay.wireformats.*;
+import cs455.overlay.wireformats.EventFactory;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
 
-/**
- * Created by david on 1/21/17.
- */
 public class TCPReceiverThread implements Runnable
 {
     private ServerSocket serverSocket;
@@ -25,7 +21,7 @@ public class TCPReceiverThread implements Runnable
      *
      * @param      port     the port number, or {@code 0} to use a port
      *                      number that is automatically allocated.
-     * @throws IOException
+     * @throws IOException  In case of error, throws Exception
      */
     public TCPReceiverThread(int port, Node node) throws IOException
     {
@@ -52,7 +48,6 @@ public class TCPReceiverThread implements Runnable
     public void run()
     {
         int dataLength;
-        int messageType;
 
         while(true)
         {
@@ -65,12 +60,11 @@ public class TCPReceiverThread implements Runnable
                     {
                         din = new DataInputStream(socket.getInputStream());
                         dataLength = din.readInt();
-                        //messageType = din.readInt();
 
                         byte[] data = new byte[dataLength];
                         din.readFully(data, 0, dataLength);
                         EventFactory.FireEvent(data, this.node);
-
+                        socket = null;
                     } catch (SocketException se)
                     {
                         System.out.println(se.getMessage());

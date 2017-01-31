@@ -13,9 +13,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-/**
- * Created by david on 1/21/17.
- */
 public class MessagingNode implements Node
 {
     private TCPReceiverThread receiver;
@@ -66,7 +63,6 @@ public class MessagingNode implements Node
         System.out.println("Node Started and awaiting orders.");
 
         ProcessInput();
-        return;
     }
 
     private static void ProcessInput()
@@ -96,7 +92,7 @@ public class MessagingNode implements Node
     }
 
 
-    public MessagingNode(String registryIPAddress, int registryPort)
+    private MessagingNode(String registryIPAddress, int registryPort)
     {
         this.registryIPAddress = registryIPAddress;
         // Debugging
@@ -112,13 +108,9 @@ public class MessagingNode implements Node
             t.start();
             System.out.println(String.format("Messaging Node: %d started TCPReceiverThread",this.hostPort));
         }
-        catch (UnknownHostException ue)
+        catch (Exception e)
         {
-            System.out.println(ue.getMessage());
-        }
-        catch (IOException ie)
-        {
-            System.out.println(ie.getMessage());
+            System.out.println(e.getMessage());
         }
 
         try
@@ -131,7 +123,6 @@ public class MessagingNode implements Node
             registerRequestMessage.Port = this.hostPort;
 
             sender.sendData(registerRequestMessage.getBytes());
-
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());

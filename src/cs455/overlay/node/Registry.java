@@ -9,14 +9,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
-import static java.lang.System.in;
-
-/**
- * Created by david on 1/21/17.
- */
 public class Registry implements Node
 {
     private TCPReceiverThread receiver;
@@ -50,7 +44,7 @@ public class Registry implements Node
 
         String registryIP="";
         try{
-            registryIP = InetAddress.getLocalHost().getHostAddress().toString();
+            registryIP = InetAddress.getLocalHost().getHostAddress();
         }
         catch (UnknownHostException e)
         {
@@ -61,7 +55,6 @@ public class Registry implements Node
 
         ProcessInput(registry);
 
-        return;
     }
 
     private static void ProcessInput(Registry registry)
@@ -146,27 +139,23 @@ public class Registry implements Node
 
 
     }
-    public Registry(int port)
+    private Registry(int port)
     {
         this.registryPort = port;
-        this.nodeList = new ArrayList<Integer>();
+        this.nodeList = new ArrayList<>();
 
         try
         {
             TCPReceiverThread receiver = new TCPReceiverThread(this.registryPort, this);
-            this.registryIPAddress = InetAddress.getLocalHost().getHostAddress().toString();
+            this.registryIPAddress = InetAddress.getLocalHost().getHostAddress();
             //receiver.run();
             Thread t = new Thread(receiver);
             t.start();
             System.out.println("Registry TCPReceiverThread running.");
         }
-        catch (UnknownHostException ue)
+        catch (Exception e)
         {
-            System.out.println(ue.getMessage());
-        }
-        catch (IOException ie)
-        {
-            System.out.println(ie.getMessage());
+            System.out.println(e.getMessage());
         }
 
     }
