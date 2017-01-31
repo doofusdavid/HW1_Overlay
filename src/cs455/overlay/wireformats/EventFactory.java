@@ -5,9 +5,7 @@ import cs455.overlay.node.Node;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-/**
- * Created by david on 1/21/17.
- */
+
 public class EventFactory
 {
     private static EventFactory ourInstance = new EventFactory();
@@ -26,21 +24,39 @@ public class EventFactory
 
         try
         {
-
+            Event message;
             switch (messageType)
             {
                 case MessageType.REGISTER_REQUEST:
                 {
-                    RegisterRequest message = new RegisterRequest(data);
-                    node.onEvent(message);
+                    message = new RegisterRequest(data);
                     break;
                 }
                 case MessageType.DEREGISTER_REQUEST:
                 {
-                    Deregister message = new Deregister(data);
+                    message = new Deregister(data);
                     break;
                 }
+                case MessageType.LINK_WEIGHTS:
+                {
+                    message = new LinkWeights(data);
+                    break;
+                }
+                case MessageType.MESSAGING_NODES_LIST:
+                {
+                    message = new MessagingNodesList(data);
+                    break;
+                }
+                case MessageType.PULL_TRAFFIC_SUMMARY:
+                {
+                    message = new PullTrafficSummary(data);
+                }
+                default:
+                    System.out.println("Event Factory: Unknown messageType.  Exiting.");
+                    return;
             }
+            node.onEvent(message);
+
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());

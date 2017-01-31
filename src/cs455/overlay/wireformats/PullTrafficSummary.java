@@ -5,24 +5,18 @@ import cs455.overlay.util.NotImplementedException;
 import java.io.IOException;
 
 
-public class LinkWeights implements Event
+public class PullTrafficSummary implements Event
 {
     private int messageType;
 
-    public LinkWeights()
+    public PullTrafficSummary()
     {
-        this.messageType = MessageType.LINK_WEIGHTS;
+        this.messageType = MessageType.PULL_TRAFFIC_SUMMARY;
     }
 
-    public LinkWeights(byte[] data)
+    public PullTrafficSummary(byte[] data)
     {
         this();
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public int getType()
-    {
         throw new NotImplementedException();
     }
 
@@ -30,5 +24,11 @@ public class LinkWeights implements Event
     public byte[] getBytes() throws IOException
     {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public int getType()
+    {
+        return this.messageType;
     }
 }

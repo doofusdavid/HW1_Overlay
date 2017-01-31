@@ -20,7 +20,7 @@ public class RegisterRequest implements Event
     @Override
     public byte[] getBytes() throws IOException
     {
-        byte[] marshalledBytes = null;
+        byte[] marshalledBytes;
         ByteArrayOutputStream baOutputStream = new ByteArrayOutputStream();
         DataOutputStream dout = new DataOutputStream(new BufferedOutputStream(baOutputStream));
 
@@ -48,6 +48,7 @@ public class RegisterRequest implements Event
 
     public RegisterRequest(byte[] marshalledBytes) throws IOException
     {
+        this();
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
 
