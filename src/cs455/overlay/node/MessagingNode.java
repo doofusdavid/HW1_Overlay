@@ -143,11 +143,11 @@ public class MessagingNode implements Node
             System.out.println(String.format("Attempting to send exit registry at: %s:%d", this.registryIPAddress, this.registryPort));
             Socket registrySocket = new Socket(this.registryIPAddress, this.registryPort);
             TCPSender sender = new TCPSender(registrySocket);
-            Deregister deregisterMessage = new Deregister();
-            deregisterMessage.Port = this.hostPort;
-            deregisterMessage.IPAddress = this.hostIPAddress;
+            DeregisterRequest deregisterRequestMessage = new DeregisterRequest();
+            deregisterRequestMessage.Port = this.hostPort;
+            deregisterRequestMessage.IPAddress = this.hostIPAddress;
 
-            sender.sendData(deregisterMessage.getBytes());
+            sender.sendData(deregisterRequestMessage.getBytes());
 
         } catch (IOException ioe)
         {

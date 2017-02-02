@@ -39,7 +39,7 @@ public class EventFactory
                 }
                 case MessageType.DEREGISTER_REQUEST:
                 {
-                    message = new Deregister(data);
+                    message = new DeregisterRequest(data);
                     break;
                 }
                 case MessageType.LINK_WEIGHTS:

@@ -22,4 +22,17 @@ public class NodeDescriptor
         this.IPAddress = IPAddress;
         this.Port = Port;
     }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj != null && obj instanceof NodeDescriptor)
+        {
+            if (((NodeDescriptor) obj).IPAddress == this.IPAddress && ((NodeDescriptor) obj).Port == this.Port)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

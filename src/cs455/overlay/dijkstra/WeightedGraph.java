@@ -104,5 +104,11 @@ public class WeightedGraph
         t.addEdge(4, 2, 7);
         t.addEdge(5, 4, 3);
         t.print();
+
+        int[] preceedingNodes = ShortestPath.ShortestPath(t, 0);
+        for(int n=0; n<6; n++)
+        {
+            ShortestPath.printPath(t, preceedingNodes, 0, n);
+        }
     }
 }

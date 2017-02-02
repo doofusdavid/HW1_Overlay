@@ -1,5 +1,6 @@
 package cs455.overlay.node;
 
+import cs455.overlay.dijkstra.NodeDescriptor;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.NotImplementedException;
@@ -25,7 +26,7 @@ public class Registry implements Node
     private TCPSender sender;
     private int registryPort;
     private String registryIPAddress;
-    private ArrayList<Integer> nodeList;
+    private ArrayList<NodeDescriptor> nodeList;
 
     public static void main(String[] args)
     {
@@ -140,9 +141,9 @@ public class Registry implements Node
         else
         {
             System.out.println(String.format("list-messaging-nodes: There are %d total registered Messaging Nodes", this.nodeList.size()));
-            for(Integer item : this.nodeList)
+            for(NodeDescriptor item : this.nodeList)
             {
-                System.out.println(String.format("list-messaging-nodes: Node registered at port %d", item));
+                System.out.println("list-messaging-nodes: Node: "+ item.toString());
             }
         }
     }
@@ -156,7 +157,7 @@ public class Registry implements Node
         {
             TCPReceiverThread receiver = new TCPReceiverThread(this.registryPort, this);
             this.registryIPAddress = InetAddress.getLocalHost().getHostAddress();
-            //receiver.run();
+
             Thread t = new Thread(receiver);
             t.start();
             System.out.println("Registry TCPReceiverThread running.");
@@ -178,7 +179,7 @@ public class Registry implements Node
         else
         {
             // Add the port and send an affirmative response.
-            this.nodeList.add(request.Port);
+            this.nodeList.add(new NodeDescriptor(0, request.IPAddress, request.Port));
             this.SendRegistrationResponse(request, StatusCode.SUCCESS, "Node Registered");
         }
     }
@@ -208,33 +209,49 @@ public class Registry implements Node
     {
         if(event instanceof RegisterRequest)
         {
-            System.out.println("Register Request Fired");
-            AddNodeToGraph(((RegisterRequest) event).IPAddress, ((RegisterRequest) event).Port);
+            RegisterNode((RegisterRequest)event);
+        }
+        else if(event instanceof DeregisterRequest)
+        {
+            DeRegisterNode((DeregisterRequest) event);
         }
     }
 
-
-    public void AddNodeToGraph(String IPAddress, int port)
+    private void DeRegisterNode(DeregisterRequest event)
     {
-        this.nodeList.add(port);
-        SendRegisterResponse(IPAddress, port, StatusCode.SUCCESS);
+        System.out.println("DeRegister Request Fired");
+        NodeDescriptor node = new NodeDescriptor(0,event.IPAddress, event.Port);
+
+        if(this.nodeList.contains(node))
+        {
+            this.nodeList.remove(node);
+            this.SendDeRegisterResponse(event, StatusCode.SUCCESS, "Node Deregistered");
+        }
+        else
+        {
+            this.SendDeRegisterResponse(event, StatusCode.FAILURE, "That node is not registered.");
+        }
     }
 
-    public void SendRegisterResponse(String nodeIpAddress, int nodePort, byte statusCode)
+    private void SendDeRegisterResponse(DeregisterRequest event, byte status, String message)
     {
         try
         {
-            Socket socket = new Socket(nodeIpAddress, nodePort);
+            System.out.println(String.format("Sending Deregistration Response to %s:%d", event.IPAddress, event.Port));
+            Socket socket = new Socket(event.IPAddress, event.Port);
             TCPSender sender = new TCPSender(socket);
-            RegisterResponse message = new RegisterResponse();
 
-            message.statusCode = statusCode;
-            message.additionalInfo = "Welcome to the network";
-            sender.sendData(message.getBytes());
+            DeregisterResponse response = new DeregisterResponse();
+            response.statusCode = status;
+            response.additionalInfo = message;
 
-        } catch (IOException e)
+            sender.sendData(response.getBytes());
+
+        } catch (IOException ioe)
         {
-           System.out.println(e.getMessage());
+            System.out.println(ioe.getMessage());
         }
     }
+
+
 }

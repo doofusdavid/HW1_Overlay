@@ -3,9 +3,9 @@ package cs455.overlay.wireformats;
 import java.io.*;
 
 /**
- *  Deregister - When a node tears down, it must deregister itself from the Registry using this format
+ *  DeregisterRequest - When a node tears down, it must deregister itself from the Registry using this format
  */
-public class Deregister implements Event
+public class DeregisterRequest implements Event
 {
     private int type;
     public String IPAddress;
@@ -41,7 +41,7 @@ public class Deregister implements Event
         return marshalledBytes;
     }
 
-    public Deregister(byte[] marshalledBytes) throws IOException
+    public DeregisterRequest(byte[] marshalledBytes) throws IOException
     {
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
@@ -60,7 +60,7 @@ public class Deregister implements Event
         din.close();
     }
 
-    public Deregister()
+    public DeregisterRequest()
     {
         this.type = MessageType.DEREGISTER_REQUEST;
     }
