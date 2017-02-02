@@ -55,6 +55,7 @@ public class EventFactory
                 case MessageType.PULL_TRAFFIC_SUMMARY:
                 {
                     message = new PullTrafficSummary(data);
+                    break;
                 }
                 default:
                     System.out.println("Event Factory: Unknown messageType.  Exiting.");
