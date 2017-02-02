@@ -14,5 +14,6 @@ public class MessageType
     public static final int TASK_COMPLETE = 6;
     public static final int PULL_TRAFFIC_SUMMARY = 7;
     public static final int TRAFFIC_SUMMARY = 8;
+    public static final int TASK_MESSAGE = 9;
 
 }
