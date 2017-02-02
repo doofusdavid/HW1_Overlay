@@ -13,6 +13,13 @@ public class NodeDescriptor
     @Override
     public String toString()
     {
-        return String.format("%d:%s:%d: ", Index, IPAddress, Port);
+        return String.format("%d:%s:%d:", Index, IPAddress, Port);
+    }
+
+    public NodeDescriptor(int Index, String IPAddress, int Port)
+    {
+        this.Index = Index;
+        this.IPAddress = IPAddress;
+        this.Port = Port;
     }
 }

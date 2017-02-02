@@ -73,15 +73,36 @@ public class WeightedGraph
     {
         for(int i=0; i<edges.length; i++)
         {
-            System.out.print(nodes[i].toString());
+            System.out.print(nodes[i].toString() + ":");
             for(int j=0; j<edges[i].length; j++)
             {
                 if(edges[i][j]>0)
                 {
-                    System.out.print(nodes[j].toString() + " - " + edges[i][j] + " ");
+                    System.out.print(nodes[j].Index + " - " + edges[i][j] + " ");
                 }
             }
             System.out.println();
         }
+    }
+
+    public static void main (String args[])
+    {
+        final WeightedGraph t = new WeightedGraph(6);
+        t.setNode(0, new NodeDescriptor(0,"v0",100));
+        t.setNode(1, new NodeDescriptor(1,"v1",100));
+        t.setNode(2, new NodeDescriptor(2,"v2",100));
+        t.setNode(3, new NodeDescriptor(3,"v3",100));
+        t.setNode(4, new NodeDescriptor(4,"v4",100));
+        t.setNode(5, new NodeDescriptor(5,"v5",100));
+        t.addEdge(0, 1, 2);
+        t.addEdge(0, 5, 9);
+        t.addEdge(1, 2, 8);
+        t.addEdge(1, 3, 15);
+        t.addEdge(1, 5, 6);
+        t.addEdge(2, 3, 1);
+        t.addEdge(4, 3, 3);
+        t.addEdge(4, 2, 7);
+        t.addEdge(5, 4, 3);
+        t.print();
     }
 }
