@@ -1,9 +1,11 @@
 package cs455.overlay.node;
 
 import cs455.overlay.dijkstra.NodeDescriptor;
+import cs455.overlay.dijkstra.WeightedGraph;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.NotImplementedException;
+import cs455.overlay.util.StringUtil;
 import cs455.overlay.wireformats.*;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.RegisterRequest;
@@ -27,6 +29,7 @@ public class Registry implements Node
     private int registryPort;
     private String registryIPAddress;
     private ArrayList<NodeDescriptor> nodeList;
+    private WeightedGraph overlay;
 
     public static void main(String[] args)
     {
@@ -74,37 +77,35 @@ public class Registry implements Node
             String input = in.nextLine();
             if(input.startsWith("setup-overlay"))
             {
-                System.out.println("Received Setup Overlay command");
+                int connectionCount = StringUtil.getIntFromStringCommand(input);
+                if(connectionCount < 1)
+                {
+                    System.out.println("Received setup-overlay with invalid parameters.  setup-overlay <number-of-connections>");
+                    break;
+                }
+                else
+                {
+                    System.out.println(String.format("Received Setup Overlay command with %d connections.", connectionCount));
+                    registry.SetupOverlay(connectionCount);
+                    continue;
+                }
 
-                // Setup overlay
 
-                break;
             }
             if(input.startsWith("start"))
             {
-                // split the string by any whitespace to get the number of rounds to perform.
-                String[] startCommand = input.split("\\s+");
-                if(startCommand.length != 2)
+
+                int roundCount = StringUtil.getIntFromStringCommand(input);
+
+                if(roundCount < 1)
                 {
                     System.out.println("Received Start command with invalid parameters.  Please try 'start <number of rounds>");
                     break;
                 }
                 else
                 {
-                    try
-                    {
-                        int numRounds = Integer.parseInt(startCommand[1]);
-                        System.out.println(String.format("Received Start command.  Starting %d rounds.", numRounds));
-
-                        // start the process
-
-                        continue;
-                    }
-                    catch (NumberFormatException nfe)
-                    {
-                        System.out.println("Received Start command with invalid parameters.  Please try 'start <number of rounds>");
-                        continue;
-                    }
+                    registry.StartConnections(roundCount);
+                    continue;
                 }
             }
 
@@ -130,6 +131,16 @@ public class Registry implements Node
                     break;
             }
         }
+    }
+
+    private void StartConnections(int roundCount)
+    {
+
+    }
+
+    private void SetupOverlay(int connectionCount)
+    {
+        this.overlay = new WeightedGraph(nodeList, connectionCount);
     }
 
     private void ListMessagingNodes()

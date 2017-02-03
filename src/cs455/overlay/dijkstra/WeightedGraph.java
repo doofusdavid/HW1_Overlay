@@ -1,5 +1,11 @@
 package cs455.overlay.dijkstra;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Random;
+
 public class WeightedGraph
 {
     private int[][] edges;
@@ -9,6 +15,58 @@ public class WeightedGraph
     {
         edges = new int[n][n];
         nodes = new NodeDescriptor[n];
+    }
+
+    public WeightedGraph(ArrayList<NodeDescriptor> nodeList, int connectionCount)
+    {
+        // allocate the edges and nodes
+        edges = new int[nodeList.size()][nodeList.size()];
+        nodes = new NodeDescriptor[nodeList.size()];
+
+        for (int i = 0; i < nodeList.size(); i++)
+        {
+            nodes[i] = nodeList.get(i);
+            // we had been ignoring indexes until now, fill them in.
+            nodes[i].Index = i;
+        }
+
+        // Create a "deck" of numbers we'll shuffle to get random node numbers
+        ArrayList<Integer> deck = new ArrayList<Integer>();
+        for (int i = 0; i < nodeList.size(); i++)
+        {
+            deck.add(i);
+        }
+
+        // keep track of connection counts per node, no more than 4
+        int[] cCount = new int[nodeList.size()];
+
+        for (NodeDescriptor node : nodes)
+        {
+            Collections.shuffle(deck);
+            Random random = new Random();
+
+            for(int i = 0; i < nodeList.size(); i++)
+            {
+                if(cCount[node.Index] < connectionCount)
+                {
+                    int nodeToLink = deck.get(cCount[node.Index]);
+
+                    // skip if it would link to itself, or the node we're
+                    // linking to already has enough connections
+                    if ((nodeToLink == node.Index) ||
+                            (cCount[nodeToLink] >= connectionCount))
+                    {
+                        continue;
+                    } else
+                    {
+                        // add an edge and increment the count of connections
+                        this.addEdge(node.Index, nodeToLink, random.nextInt(10) + 1);
+                        cCount[node.Index]++;
+                        cCount[nodeToLink]++;
+                    }
+                }
+            }
+        }
     }
 
     public int size()
@@ -87,28 +145,27 @@ public class WeightedGraph
 
     public static void main (String args[])
     {
-        final WeightedGraph t = new WeightedGraph(6);
-        t.setNode(0, new NodeDescriptor(0,"v0",100));
-        t.setNode(1, new NodeDescriptor(1,"v1",100));
-        t.setNode(2, new NodeDescriptor(2,"v2",100));
-        t.setNode(3, new NodeDescriptor(3,"v3",100));
-        t.setNode(4, new NodeDescriptor(4,"v4",100));
-        t.setNode(5, new NodeDescriptor(5,"v5",100));
-        t.addEdge(0, 1, 2);
-        t.addEdge(0, 5, 9);
-        t.addEdge(1, 2, 8);
-        t.addEdge(1, 3, 15);
-        t.addEdge(1, 5, 6);
-        t.addEdge(2, 3, 1);
-        t.addEdge(4, 3, 3);
-        t.addEdge(4, 2, 7);
-        t.addEdge(5, 4, 3);
+        ArrayList<NodeDescriptor> nodeList = new ArrayList<>();
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9000));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9001));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9002));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9003));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9004));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9005));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9006));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9007));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9008));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9009));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9010));
+
+        final WeightedGraph t = new WeightedGraph(nodeList,4);
+
         t.print();
 
-        int[] preceedingNodes = ShortestPath.ShortestPath(t, 0);
+        int[] precedingNodes = ShortestPath.ShortestPath(t, 0);
         for(int n=0; n<6; n++)
         {
-            ShortestPath.printPath(t, preceedingNodes, 0, n);
+            ShortestPath.printPath(t, precedingNodes, 0, n);
         }
     }
 }
