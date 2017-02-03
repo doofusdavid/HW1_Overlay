@@ -47,15 +47,20 @@ public class WeightedGraph
 
             for(int i = 0; i < nodeList.size(); i++)
             {
-                if(cCount[node.Index] < connectionCount)
+                if(cCount[node.Index] >= connectionCount)
                 {
-                    int nodeToLink = deck.get(cCount[node.Index]);
+                    break;
+                }
+                else
+                {
+                    int nodeToLink = deck.get(i);
 
                     // skip if it would link to itself, or the node we're
                     // linking to already has enough connections
                     if ((nodeToLink == node.Index) ||
                             (cCount[nodeToLink] >= connectionCount))
                     {
+                        i++;
                         continue;
                     } else
                     {
@@ -63,6 +68,7 @@ public class WeightedGraph
                         this.addEdge(node.Index, nodeToLink, random.nextInt(10) + 1);
                         cCount[node.Index]++;
                         cCount[nodeToLink]++;
+                        i++;
                     }
                 }
             }
@@ -86,6 +92,7 @@ public class WeightedGraph
     public void addEdge (int source, int target, int weight)
     {
         edges[source][target] = weight;
+        edges[target][source] = weight;
     }
 
     /**
@@ -158,14 +165,14 @@ public class WeightedGraph
         nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9009));
         nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9010));
 
-        final WeightedGraph t = new WeightedGraph(nodeList,4);
+        final WeightedGraph graph = new WeightedGraph(nodeList,4);
 
-        t.print();
+        graph.print();
 
-        int[] precedingNodes = ShortestPath.ShortestPath(t, 0);
-        for(int n=0; n<6; n++)
+        int[] precedingNodes = ShortestPath.ShortestPath(graph, 0);
+        for(int n=0; n<graph.size(); n++)
         {
-            ShortestPath.printPath(t, precedingNodes, 0, n);
+            ShortestPath.printPath(graph, precedingNodes, 0, n);
         }
     }
 }

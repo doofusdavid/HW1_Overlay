@@ -29,10 +29,10 @@ public class ShortestPath
 
             // Shortest path to next is distance[next] by way of precedingNode[next]
 
-            final int[] n = graph.neighbors(next);
-            for(int j = 0; j<n.length; j++)
+            final int[] neighbors = graph.neighbors(next);
+            for(int j = 0; j<neighbors.length; j++)
             {
-                int v = n[j];
+                int v = neighbors[j];
                 int d = distance[next] + graph.getWeight(next, v);
                 if(distance[v] > d)
                 {
@@ -62,6 +62,7 @@ public class ShortestPath
 
     public static void printPath (WeightedGraph graph, int[] precedingNode, int s, int e)
     {
+        System.out.println("Shortest Path from " + s + " to " + e);
         ArrayList path = new ArrayList();
         int x = e;
         while (x!=s)
