@@ -1,16 +1,12 @@
 package cs455.overlay.node;
 
 import cs455.overlay.dijkstra.NodeDescriptor;
+import cs455.overlay.dijkstra.NodeWeight;
 import cs455.overlay.dijkstra.WeightedGraph;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
-import cs455.overlay.util.NotImplementedException;
 import cs455.overlay.util.StringUtil;
 import cs455.overlay.wireformats.*;
-import cs455.overlay.wireformats.Event;
-import cs455.overlay.wireformats.RegisterRequest;
-import cs455.overlay.wireformats.RegisterResponse;
-import cs455.overlay.wireformats.StatusCode;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -113,23 +109,37 @@ public class Registry implements Node
             {
                 case "list-messaging-nodes":
                     registry.ListMessagingNodes();
-
                     break;
                 case "list-weights":
                     System.out.println("Received List Weights command");
-                    throw new NotImplementedException();
-                    // List Weights
-                    //break;
+                    if (registry.overlay == null || registry.overlay.size() == 0)
+                    {
+                        System.out.println("Overlay has not been constructed yet.  Please setup-overlay first.");
+                    } else
+                    {
+                        registry.overlay.print();
+                    }
+                    break;
                 case "send-overlay-link-weights":
                     System.out.println("Received Send Overlay Link Weights command");
-                    throw new NotImplementedException();
 
-                    // Send Overlay Link Weights
-                    //break;
+                    registry.SendOverlayLinkWeights();
+
+                    break;
                 default:
                     System.out.println("Unknown command.\nKnown commands are print-shortest-path and exit-overlay");
                     break;
             }
+        }
+    }
+
+    private void SendOverlayLinkWeights()
+    {
+        ArrayList<NodeWeight> weights = overlay.toNodeWeights();
+        // Send it
+        for (NodeDescriptor node : nodeList)
+        {
+            this.SendLinkWeights(node, weights);
         }
     }
 
@@ -257,6 +267,26 @@ public class Registry implements Node
             response.additionalInfo = message;
 
             sender.sendData(response.getBytes());
+
+        } catch (IOException ioe)
+        {
+            System.out.println(ioe.getMessage());
+        }
+    }
+
+    private void SendLinkWeights(NodeDescriptor node, ArrayList<NodeWeight> weights)
+    {
+        try
+        {
+            System.out.println(String.format("Sending LinkWeights to %s:%d", node.IPAddress, node.Port));
+            Socket socket = new Socket(node.IPAddress, node.Port);
+            TCPSender sender = new TCPSender(socket);
+
+            LinkWeights message = new LinkWeights();
+            message.nodeWeights = weights;
+            message.numberOfLinks = weights.size();
+
+            sender.sendData(message.getBytes());
 
         } catch (IOException ioe)
         {
