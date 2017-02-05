@@ -16,4 +16,5 @@ public class MessageType
     public static final int TRAFFIC_SUMMARY = 8;
     public static final int TASK_MESSAGE = 9;
     public static final int DEREGISTER_RESPONSE =  10;
+    public static final int NODE_DESCRIPTOR = 11;
 }
