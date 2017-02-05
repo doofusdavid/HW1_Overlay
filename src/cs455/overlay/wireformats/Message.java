@@ -1,7 +1,6 @@
 package cs455.overlay.wireformats;
 
 import cs455.overlay.dijkstra.NodeDescriptor;
-import cs455.overlay.util.NotImplementedException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class Message implements Event
     @Override
     public int getType()
     {
-        throw new NotImplementedException();
+        return this.type;
     }
 
     @Override

@@ -219,5 +219,6 @@ public class MessagingNode implements Node
     {
         System.out.println("Link Weights Received");
         this.weights = event.nodeWeights;
+        System.out.println(this.weights.toString());
     }
 }
