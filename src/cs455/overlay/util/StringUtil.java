@@ -11,7 +11,7 @@ public class StringUtil
             return -1;
         try
         {
-            int commandInt = Integer.parseInt(command);
+            int commandInt = Integer.parseInt(commandArray[1]);
             return commandInt;
         }
         catch (NumberFormatException nfe)
