@@ -5,13 +5,13 @@ import java.io.*;
 
 public class DeregisterResponse implements Event
 {
-    private int type;
+    private final int type = MessageType.DEREGISTER_RESPONSE;
     public byte statusCode;
     public String additionalInfo;
 
     public DeregisterResponse()
     {
-        this.type = MessageType.DEREGISTER_RESPONSE;
+
     }
 
     public DeregisterResponse(byte[] marshalledBytes) throws IOException
@@ -19,7 +19,11 @@ public class DeregisterResponse implements Event
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
 
-        this.type = din.readInt();
+        int type = din.readInt();
+        if (type != MessageType.DEREGISTER_RESPONSE)
+        {
+            throw new IllegalArgumentException("Bytes didn't correspond to a DeRegisterResponse.");
+        }
 
         this.statusCode = din.readByte();
 
@@ -27,7 +31,7 @@ public class DeregisterResponse implements Event
         byte[] aiBytes = new byte[aiLength];
         din.readFully(aiBytes);
 
-        this.additionalInfo = new String (aiBytes);
+        this.additionalInfo = new String(aiBytes);
 
         int ipLength = din.readInt();
         byte[] ipBytes = new byte[ipLength];

@@ -7,14 +7,14 @@ import java.io.*;
  */
 public class RegisterRequest implements Event
 {
-    private int type;
+    private final int type = MessageType.REGISTER_REQUEST;
     public String IPAddress;
     public int Port;
 
     @Override
     public int getType()
     {
-        return 0;
+        return this.type;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class RegisterRequest implements Event
 
     public RegisterRequest()
     {
-        this.type = MessageType.REGISTER_REQUEST;
+
     }
 
     public RegisterRequest(byte[] marshalledBytes) throws IOException
@@ -51,7 +51,11 @@ public class RegisterRequest implements Event
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
 
-        this.type = din.readInt();
+        int type = din.readInt();
+        if (type != MessageType.REGISTER_REQUEST)
+        {
+            throw new IllegalArgumentException("Bytes didn't correspond to a RegisterRequest.");
+        }
 
         int ipLength = din.readInt();
         byte[] ipBytes = new byte[ipLength];

@@ -2,19 +2,15 @@ package cs455.overlay.wireformats;
 
 import java.io.*;
 
-/**
- * Created by david on 1/29/17.
- */
 public class RegisterResponse implements Event
 {
 
-    private int type;
+    private final int type = MessageType.REGISTER_RESPONSE;
     public byte statusCode;
     public String additionalInfo;
 
     public RegisterResponse()
     {
-        this.type = MessageType.REGISTER_RESPONSE;
     }
 
     public RegisterResponse(byte[] marshalledBytes) throws IOException
@@ -22,7 +18,11 @@ public class RegisterResponse implements Event
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
 
-        this.type = din.readInt();
+        int type = din.readInt();
+        if (type != MessageType.REGISTER_RESPONSE)
+        {
+            throw new IllegalArgumentException("Bytes didn't correspond to a RegisterResponse.");
+        }
 
         this.statusCode = din.readByte();
 

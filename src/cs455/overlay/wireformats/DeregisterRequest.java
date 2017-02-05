@@ -7,7 +7,7 @@ import java.io.*;
  */
 public class DeregisterRequest implements Event
 {
-    private int type;
+    private final int type = MessageType.DEREGISTER_REQUEST;
     public String IPAddress;
     public int Port;
 
@@ -46,7 +46,11 @@ public class DeregisterRequest implements Event
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
 
-        this.type = din.readInt();
+        int type = din.readInt();
+        if (type != MessageType.DEREGISTER_REQUEST)
+        {
+            throw new IllegalArgumentException("Bytes didn't correspond to a DeRegisterRequest.");
+        }
 
         int ipLength = din.readInt();
         byte[] ipBytes = new byte[ipLength];
@@ -62,6 +66,5 @@ public class DeregisterRequest implements Event
 
     public DeregisterRequest()
     {
-        this.type = MessageType.DEREGISTER_REQUEST;
     }
 }
