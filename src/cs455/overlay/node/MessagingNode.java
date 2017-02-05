@@ -1,5 +1,6 @@
 package cs455.overlay.node;
 
+import cs455.overlay.dijkstra.NodeWeight;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.IPChecker;
@@ -9,6 +10,7 @@ import cs455.overlay.wireformats.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MessagingNode implements Node
@@ -20,6 +22,7 @@ public class MessagingNode implements Node
     private String registryIPAddress;
     private int registryPort;
     private boolean connectedToRegistry;
+    private ArrayList<NodeWeight> weights;
 
     // keep track of number of messages sent/receive by this node
     private int receiveTracker;
@@ -197,5 +200,24 @@ public class MessagingNode implements Node
         {
             this.ReceiveRegistrationResponse((RegisterResponse) event);
         }
+        if (event instanceof LinkWeights)
+        {
+            this.ReceiveLinkWeights((LinkWeights) event);
+        }
+        if (event instanceof Message)
+        {
+            this.ReceiveMessage((Message) event);
+        }
+    }
+
+    private void ReceiveMessage(Message event)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void ReceiveLinkWeights(LinkWeights event)
+    {
+        System.out.println("Link Weights Received");
+        this.weights = event.nodeWeights;
     }
 }
