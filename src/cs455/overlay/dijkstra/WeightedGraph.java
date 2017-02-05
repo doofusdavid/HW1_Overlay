@@ -1,8 +1,6 @@
 package cs455.overlay.dijkstra;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 
@@ -116,17 +114,23 @@ public class WeightedGraph
         return edges[source][target];
     }
 
+    /**
+     * Gets the neighbor nodes of the one sent in
+     *
+     * @param vertex
+     * @return int array of the neighbor nodes
+     */
     public int[] neighbors (int vertex)
     {
         int count = 0;
-        for (int i=0; i<edges[vertex].length; i++)
+        for (int i = 0; i<edges[vertex].length; i++)
         {
             if(edges[vertex][i]>0)
                 count++;
         }
         final int[]answer = new int[count];
         count = 0;
-        for(int i=0;i<edges[vertex].length; i++)
+        for(int i = 0; i<edges[vertex].length; i++)
         {
             if(edges[vertex][i]>0)
                 answer[count++] = i;
@@ -136,10 +140,10 @@ public class WeightedGraph
 
     public void print()
     {
-        for(int i=0; i<edges.length; i++)
+        for(int i = 0; i<edges.length; i++)
         {
             System.out.print(nodes[i].toString() + ":");
-            for(int j=0; j<edges[i].length; j++)
+            for(int j = 0; j<edges[i].length; j++)
             {
                 if(edges[i][j]>0)
                 {
@@ -148,6 +152,24 @@ public class WeightedGraph
             }
             System.out.println();
         }
+    }
+
+    public ArrayList<NodeWeight> toNodeWeights()
+    {
+        ArrayList<NodeWeight> weights = new ArrayList<>(edges.length);
+        for (int i = 0; i < edges.length; i++)
+        {
+            NodeDescriptor source = nodes[i];
+            for (int j = 0; j < edges[i].length; j++)
+            {
+                if (edges[i][j] > 0)
+                {
+                    NodeDescriptor destination = nodes[j];
+                    weights.add(new NodeWeight(source, destination, edges[i][j]));
+                }
+            }
+        }
+        return weights;
     }
 
     public static void main (String args[])
