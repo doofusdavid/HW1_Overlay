@@ -34,6 +34,7 @@ public class MessagingNode implements Node
     // keep track of number of messages sent/receive by this node
     private int receiveTracker;
     private int sendTracker;
+    private int relayTracker;
 
     // keep track of the sum of the random numbers sent
     private long sendSummation;
@@ -190,6 +191,11 @@ public class MessagingNode implements Node
     {
         this.receiveTracker++;
     }
+
+    private synchronized void incrementRelayCounter()
+    {
+        this.relayTracker++;
+    }
     private synchronized void addReceiveSummation(int value)
     {
         this.receiveSummation += value;
@@ -259,7 +265,8 @@ public class MessagingNode implements Node
             TCPSender sender = new TCPSender(registrySocket);
 
             sender.sendData(message.getBytes());
-
+            this.incrementSentCounter();
+            this.addSentSummation(message.getPayload());
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());
@@ -282,6 +289,7 @@ public class MessagingNode implements Node
     }
     private void ReceiveMessage(Message event)
     {
+        this.incrementReceivedCounter();
         ArrayList<NodeDescriptor> route = event.getRoutingPath();
         NodeDescriptor me = new NodeDescriptor(0, this.hostIPAddress, this.hostPort);
         if (event.getDestination() == me)
@@ -306,6 +314,7 @@ public class MessagingNode implements Node
         }
         if (nextNode != null)
         {
+            this.incrementRelayCounter();
             this.SendMessageToNode(event, nextNode);
         }
     }

@@ -58,10 +58,9 @@ public class NodeDescriptor implements Event
     {
         if (obj != null && obj instanceof NodeDescriptor)
         {
-            if (((NodeDescriptor) obj).IPAddress == this.IPAddress && ((NodeDescriptor) obj).Port == this.Port)
-            {
+            NodeDescriptor compare = (NodeDescriptor) obj;
+            if (compare.IPAddress.equals(this.IPAddress) && compare.Port == this.Port)
                 return true;
-            }
         }
         return false;
     }

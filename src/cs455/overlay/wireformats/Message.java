@@ -11,32 +11,10 @@ import java.util.ArrayList;
 public class Message implements Event
 {
     private final int type = MessageType.TASK_MESSAGE;
-
-    public NodeDescriptor getSource()
-    {
-        return source;
-    }
-
-    public NodeDescriptor getDestination()
-    {
-        return destination;
-    }
-
-    public int getPayload()
-    {
-        return payload;
-    }
-
-    public ArrayList<NodeDescriptor> getRoutingPath()
-    {
-        return routingPath;
-    }
-
     private NodeDescriptor source;
     private NodeDescriptor destination;
     private int payload;
     private ArrayList<NodeDescriptor> routingPath;
-
 
     public Message(NodeDescriptor source, NodeDescriptor destination, int payload, ArrayList<NodeDescriptor> routingPath)
     {
@@ -45,7 +23,6 @@ public class Message implements Event
         this.payload = payload;
         this.routingPath = routingPath;
     }
-
     public Message(byte[] marshalledBytes) throws IOException
     {
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
@@ -84,6 +61,25 @@ public class Message implements Event
         din.close();
     }
 
+    public NodeDescriptor getSource()
+    {
+        return source;
+    }
+
+    public NodeDescriptor getDestination()
+    {
+        return destination;
+    }
+
+    public int getPayload()
+    {
+        return payload;
+    }
+
+    public ArrayList<NodeDescriptor> getRoutingPath()
+    {
+        return routingPath;
+    }
 
     @Override
     public int getType()

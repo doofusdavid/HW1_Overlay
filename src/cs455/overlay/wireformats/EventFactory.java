@@ -62,6 +62,11 @@ public class EventFactory
                     message = new Message(data);
                     break;
                 }
+                case MessageType.TASK_INITIATE:
+                {
+                    message = new TaskInitiate(data);
+                    break;
+                }
                 default:
                     System.out.println("Event Factory: Unknown messageType.  Exiting.");
                     return;
