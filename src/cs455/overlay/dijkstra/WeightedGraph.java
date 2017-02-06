@@ -15,6 +15,17 @@ public class WeightedGraph
         nodes = new NodeDescriptor[n];
     }
 
+    public int indexOfNode(NodeDescriptor node)
+    {
+        for (int i = 0; i < nodes.length; i++)
+        {
+            if (nodes[i] == node)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
     public WeightedGraph(ArrayList<NodeDescriptor> nodeList, int connectionCount)
     {
         // allocate the edges and nodes
@@ -114,6 +125,11 @@ public class WeightedGraph
         return edges[source][target];
     }
 
+    public int getWeight(NodeDescriptor source, NodeDescriptor target)
+    {
+        return edges[indexOfNode(source)][indexOfNode(target)];
+    }
+
     /**
      * Gets the neighbor nodes of the one sent in
      *
@@ -151,6 +167,36 @@ public class WeightedGraph
                 }
             }
             System.out.println();
+        }
+    }
+
+    /**
+     * Used by Messaging Nodes to rehydrate a WeightedGraph frmo a LinkWeights
+     * message
+     *
+     * @param nodeWeights the list of NodeWeights sent by the registry
+     */
+    public WeightedGraph(ArrayList<NodeWeight> nodeWeights)
+    {
+        ArrayList<NodeDescriptor> nodes = new ArrayList<>();
+
+        // first, get all the distinct nodes
+        for (NodeWeight nw : nodeWeights)
+        {
+            if (!nodes.contains(nw.source))
+            {
+                nodes.add(nw.source);
+            }
+        }
+        this.nodes = nodes.toArray(new NodeDescriptor[nodes.size()]);
+        this.edges = new int[nodes.size()][nodes.size()];
+
+        for (NodeWeight nw : nodeWeights)
+        {
+            int i = nodes.indexOf(nw.source);
+            int j = nodes.indexOf(nw.destination);
+            this.edges[i][j] = nw.weight;
+            this.edges[j][i] = nw.weight;
         }
     }
 
@@ -192,9 +238,28 @@ public class WeightedGraph
         graph.print();
 
         int[] precedingNodes = ShortestPath.ShortestPath(graph, 0);
-        for(int n=0; n<graph.size(); n++)
+        for(int n = 0; n<graph.size(); n++)
         {
             ShortestPath.printPath(graph, precedingNodes, 0, n);
         }
+    }
+
+    public NodeDescriptor[] neighbors(NodeDescriptor next)
+    {
+        int count = 0;
+        int nodeIndex = indexOfNode(next);
+        for (int i = 0; i < edges[nodeIndex].length; i++)
+        {
+            if (edges[nodeIndex][i] > 0)
+                count++;
+        }
+        final NodeDescriptor[] answer = new NodeDescriptor[count];
+        count = 0;
+        for (int i = 0; i < edges[nodeIndex].length; i++)
+        {
+            if (edges[nodeIndex][i] > 0)
+                answer[count++] = nodes[i];
+        }
+        return answer;
     }
 }
