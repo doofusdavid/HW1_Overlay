@@ -1,6 +1,9 @@
 package cs455.overlay.node;
 
+import cs455.overlay.dijkstra.NodeDescriptor;
 import cs455.overlay.dijkstra.NodeWeight;
+import cs455.overlay.dijkstra.ShortestPath;
+import cs455.overlay.dijkstra.WeightedGraph;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.IPChecker;
@@ -11,6 +14,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.ListIterator;
+import java.util.Random;
 import java.util.Scanner;
 
 public class MessagingNode implements Node
@@ -23,6 +28,8 @@ public class MessagingNode implements Node
     private int registryPort;
     private boolean connectedToRegistry;
     private ArrayList<NodeWeight> weights;
+    private ArrayList<NodeDescriptor> otherNodes;
+    private WeightedGraph graph;
 
     // keep track of number of messages sent/receive by this node
     private int receiveTracker;
@@ -94,7 +101,6 @@ public class MessagingNode implements Node
             }
         }
     }
-
 
     private MessagingNode(String registryIPAddress, int registryPort)
     {
@@ -208,17 +214,108 @@ public class MessagingNode implements Node
         {
             this.ReceiveMessage((Message) event);
         }
+        if (event instanceof TaskInitiate)
+        {
+            this.InitiateTask((TaskInitiate) event);
+        }
     }
 
+    private void SetOtherNodeList()
+    {
+        ArrayList<NodeDescriptor> otherNodes = new ArrayList<>();
+
+        for (NodeWeight nw : this.weights)
+        {
+            // we only want other nodes, not our self
+            if (nw.source.IPAddress == this.hostIPAddress && nw.source.Port == this.hostPort)
+                continue;
+
+            // get a list of the other nodes we can use as sinks.
+            if (!otherNodes.contains(nw.source))
+                otherNodes.add(nw.source);
+        }
+        this.otherNodes = otherNodes;
+    }
+
+    private void InitiateTask(TaskInitiate event)
+    {
+        int rounds = event.rounds;
+        Random random = new Random();
+        SetOtherNodeList();
+
+        for (int i = 0; i < rounds; rounds++)
+        {
+            int nodeNum = random.nextInt(this.otherNodes.size());
+            SendMessage(this.otherNodes.get(nodeNum));
+        }
+    }
+
+    private void SendMessageToNode(Message message, NodeDescriptor node)
+    {
+        try
+        {
+            System.out.println(String.format("Sending Message to : %s:%d", node.IPAddress, node.Port));
+            Socket registrySocket = new Socket(node.IPAddress, node.Port);
+            TCPSender sender = new TCPSender(registrySocket);
+
+            sender.sendData(message.getBytes());
+
+        } catch (IOException ioe)
+        {
+            System.out.println(ioe.getMessage());
+        }
+
+    }
+
+    private void SendMessage(NodeDescriptor sinkNode)
+    {
+        ArrayList<NodeDescriptor> nodePath = ShortestPath.ShortestPath(this.graph, sinkNode);
+        NodeDescriptor source = new NodeDescriptor(0, this.hostIPAddress, this.hostPort);
+        Random random = new Random();
+        int payload = random.nextInt();
+        Message message = new Message(source, sinkNode, payload, nodePath);
+
+        // Send to the first item in the path list
+        SendMessageToNode(message, nodePath.get(0));
+
+
+    }
     private void ReceiveMessage(Message event)
     {
-        throw new NotImplementedException();
+        ArrayList<NodeDescriptor> route = event.getRoutingPath();
+        NodeDescriptor me = new NodeDescriptor(0, this.hostIPAddress, this.hostPort);
+        if (event.getDestination() == me)
+        {
+            // We've reached the destination!
+            System.out.println("Message received destination");
+            this.addReceiveSummation(event.getPayload());
+            return;
+        }
+
+        // Find the next node in the routing path
+        ListIterator<NodeDescriptor> node = route.listIterator();
+        NodeDescriptor nextNode = null;
+        while (node.hasNext())
+        {
+            NodeDescriptor current = node.next();
+            if (current == me)
+            {
+                nextNode = node.next();
+                break;
+            }
+        }
+        if (nextNode != null)
+        {
+            this.SendMessageToNode(event, nextNode);
+        }
     }
 
     private void ReceiveLinkWeights(LinkWeights event)
     {
-        System.out.println("Link Weights Received");
         this.weights = event.nodeWeights;
+        this.graph = new WeightedGraph(event.nodeWeights);
+
+        System.out.println("Link Weights received and processed.  Ready to send messages.");
         System.out.println(this.weights.toString());
     }
 }
