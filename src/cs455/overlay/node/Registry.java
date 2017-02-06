@@ -127,7 +127,7 @@ public class Registry implements Node
 
                     break;
                 default:
-                    System.out.println("Unknown command.\nKnown commands are print-shortest-path and exit-overlay");
+                    System.out.println("Unknown command.\nKnown commands are\n list-messaging-nodes\nlist-weights\nsetup-overlay <numConnections>\nstart <numRounds>\nsend-overlay-link-weights\nprint-shortest-path\nexit-overlay");
                     break;
             }
         }
@@ -143,9 +143,32 @@ public class Registry implements Node
         }
     }
 
+    private void SendStartConnection(NodeDescriptor node, int rounds)
+    {
+        try
+        {
+            System.out.println("Sending StartConnection to" + node.toString());
+            Socket socket = new Socket(node.IPAddress, node.Port);
+            TCPSender sender = new TCPSender(socket);
+
+            TaskInitiate taskInitiate = new TaskInitiate();
+            taskInitiate.rounds = rounds;
+
+            sender.sendData(taskInitiate.getBytes());
+
+        } catch (IOException ioe)
+        {
+            System.out.println(ioe.getMessage());
+        }
+    }
     private void StartConnections(int roundCount)
     {
-
+        ArrayList<NodeWeight> weights = overlay.toNodeWeights();
+        // Send it
+        for (NodeDescriptor node : nodeList)
+        {
+            this.SendStartConnection(node, roundCount);
+        }
     }
 
     private void SetupOverlay(int connectionCount)

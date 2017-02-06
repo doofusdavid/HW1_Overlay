@@ -11,6 +11,11 @@ public class TaskInitiate implements Event
     public final int type = MessageType.TASK_INITIATE;
     public int rounds;
 
+    public TaskInitiate()
+    {
+
+    }
+
 
     @Override
     public int getType()
