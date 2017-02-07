@@ -21,17 +21,10 @@ public class NodeDescriptor implements Event
         this(element.getBytes());
     }
 
-    @Override
-    public String toString()
+    public NodeDescriptor(String IPAddress, int Port)
     {
-        return String.format("%s:%d", IPAddress, Port);
+        this(0, IPAddress, Port);
     }
-
-    public String toExtendedString()
-    {
-        return String.format("%d:%s:%d:", Index, IPAddress, Port);
-    }
-
     public NodeDescriptor(int Index, String IPAddress, int Port)
     {
         this.Index = Index;
@@ -53,6 +46,18 @@ public class NodeDescriptor implements Event
             throw new IllegalArgumentException("Bytes did not construct a valid node.");
         }
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s:%d", IPAddress, Port);
+    }
+
+    public String toExtendedString()
+    {
+        return String.format("%d:%s:%d:", Index, IPAddress, Port);
+    }
+
     @Override
     public boolean equals(Object obj)
     {
@@ -71,6 +76,14 @@ public class NodeDescriptor implements Event
         return this.type;
     }
 
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + IPAddress.hashCode() + Port;
+        return result;
+    }
     @Override
     public byte[] getBytes() throws IOException
     {
