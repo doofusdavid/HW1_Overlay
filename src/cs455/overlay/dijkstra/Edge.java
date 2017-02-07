@@ -2,22 +2,15 @@ package cs455.overlay.dijkstra;
 
 public class Edge
 {
-    private final String id;
     private final NodeDescriptor source;
     private final NodeDescriptor destination;
     private final int weight;
 
-    public Edge(String id, NodeDescriptor source, NodeDescriptor destination, int weight)
+    public Edge(NodeDescriptor source, NodeDescriptor destination, int weight)
     {
-        this.id = id;
         this.source = source;
         this.destination = destination;
         this.weight = weight;
-    }
-
-    public String getId()
-    {
-        return id;
     }
 
     public NodeDescriptor getDestination()
@@ -38,8 +31,34 @@ public class Edge
     @Override
     public String toString()
     {
-        return source + " " + destination;
+        return source + " " + destination + " " + weight + "\n";
+    }
+
+    public boolean contains(NodeDescriptor node)
+    {
+        if (this.source.equals(node) || this.destination.equals(node))
+            return true;
+        else
+            return false;
     }
 
 
+    public boolean exists(Object obj)
+    {
+        Edge edgeTest = (Edge) obj;
+        if (this.source.equals(edgeTest.source))
+        {
+            if (this.destination.equals(edgeTest.destination))
+            {
+                return true;
+            }
+        } else if (this.source.equals(edgeTest.destination))
+        {
+            if (this.destination.equals(edgeTest.source))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
