@@ -39,6 +39,8 @@ public class WeightedGraph
             nodes[i].Index = i;
         }
 
+        // TODO: Ensure there are no partitions, by connecting 1 to 2, 2 to 3, etc
+
         // Create a "deck" of numbers we'll shuffle to get random node numbers
         ArrayList<Integer> deck = new ArrayList<Integer>();
         for (int i = 0; i < nodeList.size(); i++)
@@ -238,6 +240,12 @@ public class WeightedGraph
         graph.print();
 
         int[] precedingNodes = ShortestPath.ShortestPath(graph, 0);
+        ArrayList<NodeDescriptor> precedingNodeList = ShortestPath.ShortestPath(graph, nodeList.get(0));
+
+        for (NodeDescriptor n : graph.nodes)
+        {
+            ShortestPath.printPath(graph, precedingNodeList, nodeList.get(0), n);
+        }
         for(int n = 0; n<graph.size(); n++)
         {
             ShortestPath.printPath(graph, precedingNodes, 0, n);

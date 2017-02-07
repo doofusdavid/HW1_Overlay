@@ -100,6 +100,19 @@ public class ShortestPath
         return y;
     }
 
+    public static void printPath(WeightedGraph graph, ArrayList<NodeDescriptor> precedingNodes, NodeDescriptor source, NodeDescriptor sink)
+    {
+        System.out.println("Shortest Path from " + source + " to " + sink);
+        ArrayList<NodeDescriptor> path = new ArrayList<>();
+        NodeDescriptor x = sink;
+        while (x != source)
+        {
+            path.add(0, x);
+            x = precedingNodes.get(precedingNodes.indexOf(x));
+        }
+        path.add(0, sink);
+        System.out.println(path);
+    }
     public static void printPath (WeightedGraph graph, int[] precedingNode, int s, int e)
     {
         System.out.println("Shortest Path from " + s + " to " + e);
