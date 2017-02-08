@@ -1,9 +1,9 @@
 package cs455.overlay.node;
 
+import cs455.overlay.dijkstra.DijkstraAlgorithm;
+import cs455.overlay.dijkstra.Edge;
+import cs455.overlay.dijkstra.Graph;
 import cs455.overlay.dijkstra.NodeDescriptor;
-import cs455.overlay.dijkstra.NodeWeight;
-import cs455.overlay.dijkstra.ShortestPath;
-import cs455.overlay.dijkstra.WeightedGraph;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.IPChecker;
@@ -27,9 +27,9 @@ public class MessagingNode implements Node
     private String registryIPAddress;
     private int registryPort;
     private boolean connectedToRegistry;
-    private ArrayList<NodeWeight> weights;
+    private ArrayList<Edge> edges;
     private ArrayList<NodeDescriptor> otherNodes;
-    private WeightedGraph graph;
+    private Graph graph;
 
     // keep track of number of messages sent/receive by this node
     private int receiveTracker;
@@ -39,6 +39,30 @@ public class MessagingNode implements Node
     // keep track of the sum of the random numbers sent
     private long sendSummation;
     private long receiveSummation;
+
+    private MessagingNode(String registryIPAddress, int registryPort)
+    {
+        this.registryIPAddress = registryIPAddress;
+        this.registryPort = registryPort;
+        this.connectedToRegistry = false;
+
+        try
+        {
+            TCPReceiverThread receiver = new TCPReceiverThread(0, this);
+            this.hostPort = receiver.getPort();
+            this.hostIPAddress = InetAddress.getLocalHost().getHostAddress();
+            Thread t = new Thread(receiver);
+            t.start();
+            System.out.println(String.format("Messaging Node: %d started TCPReceiverThread", this.hostPort));
+        } catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        // Connect to Registry
+        this.SendRegistrationRequest();
+
+    }
 
     public static void main(String[] args)
     {
@@ -101,31 +125,6 @@ public class MessagingNode implements Node
                     break;
             }
         }
-    }
-
-    private MessagingNode(String registryIPAddress, int registryPort)
-    {
-        this.registryIPAddress = registryIPAddress;
-        this.registryPort = registryPort;
-        this.connectedToRegistry = false;
-
-        try
-        {
-            TCPReceiverThread receiver = new TCPReceiverThread(0, this);
-            this.hostPort = receiver.getPort();
-            this.hostIPAddress = InetAddress.getLocalHost().getHostAddress();
-            Thread t = new Thread(receiver);
-            t.start();
-            System.out.println(String.format("Messaging Node: %d started TCPReceiverThread",this.hostPort));
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        // Connect to Registry
-        this.SendRegistrationRequest();
-
     }
 
     private void SendRegistrationRequest()
@@ -230,15 +229,15 @@ public class MessagingNode implements Node
     {
         ArrayList<NodeDescriptor> otherNodes = new ArrayList<>();
 
-        for (NodeWeight nw : this.weights)
+        for (Edge edge : this.edges)
         {
             // we only want other nodes, not our self
-            if (nw.source.IPAddress == this.hostIPAddress && nw.source.Port == this.hostPort)
+            if (edge.getSource().IPAddress == this.hostIPAddress && edge.getSource().Port == this.hostPort)
                 continue;
 
             // get a list of the other nodes we can use as sinks.
-            if (!otherNodes.contains(nw.source))
-                otherNodes.add(nw.source);
+            if (!otherNodes.contains(edge.getSource()))
+                otherNodes.add(edge.getSource());
         }
         this.otherNodes = otherNodes;
     }
@@ -276,8 +275,11 @@ public class MessagingNode implements Node
 
     private void SendMessage(NodeDescriptor sinkNode)
     {
-        ArrayList<NodeDescriptor> nodePath = ShortestPath.ShortestPath(this.graph, sinkNode);
-        NodeDescriptor source = new NodeDescriptor(0, this.hostIPAddress, this.hostPort);
+        NodeDescriptor source = new NodeDescriptor(this.hostIPAddress, this.hostPort);
+        DijkstraAlgorithm da = new DijkstraAlgorithm(this.graph);
+        da.execute(source);
+        ArrayList<NodeDescriptor> nodePath = new ArrayList<>(da.getPath(sinkNode));
+
         Random random = new Random();
         int payload = random.nextInt();
         Message message = new Message(source, sinkNode, payload, nodePath);
@@ -321,10 +323,10 @@ public class MessagingNode implements Node
 
     private void ReceiveLinkWeights(LinkWeights event)
     {
-        this.weights = event.nodeWeights;
-        this.graph = new WeightedGraph(event.nodeWeights);
+        this.edges = event.nodeWeights;
+        this.graph = new Graph(event.nodeWeights);
 
         System.out.println("Link Weights received and processed.  Ready to send messages.");
-        System.out.println(this.weights.toString());
+        System.out.println(this.edges.toString());
     }
 }

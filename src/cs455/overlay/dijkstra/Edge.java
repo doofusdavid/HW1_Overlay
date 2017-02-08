@@ -13,6 +13,18 @@ public class Edge
         this.weight = weight;
     }
 
+    public Edge(byte[] edgeBytes)
+    {
+        String edgeString = new String(edgeBytes);
+        String[] elements = edgeString.split(" ");
+        if (elements.length != 3)
+            throw new IllegalArgumentException("Not a valid Edge bytestream");
+
+        this.source = new NodeDescriptor(elements[0]);
+        this.destination = new NodeDescriptor(elements[1]);
+        this.weight = Integer.parseInt(elements[2]);
+    }
+
     public NodeDescriptor getDestination()
     {
         return destination;
@@ -31,7 +43,12 @@ public class Edge
     @Override
     public String toString()
     {
-        return source + " " + destination + " " + weight + "\n";
+        return source.toString() + " " + destination.toString() + " " + weight;
+    }
+
+    public byte[] getBytes()
+    {
+        return this.toString().getBytes();
     }
 
     public boolean contains(NodeDescriptor node)
@@ -61,4 +78,6 @@ public class Edge
         }
         return false;
     }
+
+
 }

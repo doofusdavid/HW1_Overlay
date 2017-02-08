@@ -1,8 +1,8 @@
 package cs455.overlay.node;
 
+import cs455.overlay.dijkstra.Edge;
+import cs455.overlay.dijkstra.Graph;
 import cs455.overlay.dijkstra.NodeDescriptor;
-import cs455.overlay.dijkstra.NodeWeight;
-import cs455.overlay.dijkstra.WeightedGraph;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.StringUtil;
@@ -25,7 +25,26 @@ public class Registry implements Node
     private int registryPort;
     private String registryIPAddress;
     private ArrayList<NodeDescriptor> nodeList;
-    private WeightedGraph overlay;
+    private Graph overlay;
+
+    private Registry(int port)
+    {
+        this.registryPort = port;
+        this.nodeList = new ArrayList<>();
+
+        try
+        {
+            TCPReceiverThread receiver = new TCPReceiverThread(this.registryPort, this);
+            this.registryIPAddress = InetAddress.getLocalHost().getHostAddress();
+
+            Thread t = new Thread(receiver);
+            t.start();
+            System.out.println("Registry TCPReceiverThread running.");
+        } catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
 
     public static void main(String[] args)
     {
@@ -112,12 +131,12 @@ public class Registry implements Node
                     break;
                 case "list-weights":
                     System.out.println("Received List Weights command");
-                    if (registry.overlay == null || registry.overlay.size() == 0)
+                    if (registry.overlay == null || registry.overlay.getSize() == 0)
                     {
                         System.out.println("Overlay has not been constructed yet.  Please setup-overlay first.");
                     } else
                     {
-                        registry.overlay.print();
+                        registry.overlay.printEdges();
                     }
                     break;
                 case "send-overlay-link-weights":
@@ -135,7 +154,7 @@ public class Registry implements Node
 
     private void SendOverlayLinkWeights()
     {
-        ArrayList<NodeWeight> weights = overlay.toNodeWeights();
+        ArrayList<Edge> weights = new ArrayList<>(overlay.getEdges());
         // Send it
         for (NodeDescriptor node : nodeList)
         {
@@ -161,9 +180,9 @@ public class Registry implements Node
             System.out.println(ioe.getMessage());
         }
     }
+
     private void StartConnections(int roundCount)
     {
-        ArrayList<NodeWeight> weights = overlay.toNodeWeights();
         // Send it
         for (NodeDescriptor node : nodeList)
         {
@@ -173,7 +192,7 @@ public class Registry implements Node
 
     private void SetupOverlay(int connectionCount)
     {
-        this.overlay = new WeightedGraph(nodeList, connectionCount);
+        this.overlay = new Graph(nodeList, connectionCount);
     }
 
     private void ListMessagingNodes()
@@ -189,26 +208,6 @@ public class Registry implements Node
             {
                 System.out.println("list-messaging-nodes: Node: "+ item.toString());
             }
-        }
-    }
-
-    private Registry(int port)
-    {
-        this.registryPort = port;
-        this.nodeList = new ArrayList<>();
-
-        try
-        {
-            TCPReceiverThread receiver = new TCPReceiverThread(this.registryPort, this);
-            this.registryIPAddress = InetAddress.getLocalHost().getHostAddress();
-
-            Thread t = new Thread(receiver);
-            t.start();
-            System.out.println("Registry TCPReceiverThread running.");
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
         }
     }
 
@@ -297,7 +296,7 @@ public class Registry implements Node
         }
     }
 
-    private void SendLinkWeights(NodeDescriptor node, ArrayList<NodeWeight> weights)
+    private void SendLinkWeights(NodeDescriptor node, ArrayList<Edge> weights)
     {
         try
         {

@@ -19,6 +19,56 @@ public class DijkstraAlgorithm
         this.graph = graph;
     }
 
+    public static void main(String args[])
+    {
+        ArrayList<NodeDescriptor> nodeList = new ArrayList<>();
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9000));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9001));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9002));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9003));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9004));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9005));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9006));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9007));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9008));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9009));
+        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9010));
+
+//        ArrayList<Edge> edgeList = new ArrayList<>();
+//        Random random = new Random();
+//
+//        edgeList.add(new Edge(nodeList.get(0), nodeList.get(1), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(0), nodeList.get(2), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(0), nodeList.get(3), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(0), nodeList.get(4), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(1), nodeList.get(2), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(2), nodeList.get(3), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(3), nodeList.get(4), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(4), nodeList.get(5), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(5), nodeList.get(6), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(6), nodeList.get(7), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(7), nodeList.get(8), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(8), nodeList.get(9), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(9), nodeList.get(4), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(4), nodeList.get(2), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(5), nodeList.get(7), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(6), nodeList.get(9), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(7), nodeList.get(2), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(8), nodeList.get(3), random.nextInt(10)+1));
+//        edgeList.add(new Edge(nodeList.get(9), nodeList.get(4), random.nextInt(10)+1));
+
+//        System.out.println(edgeList);
+        Graph graph = new Graph(nodeList, 4);
+        System.out.println(graph.getEdges());
+
+        DijkstraAlgorithm da = new DijkstraAlgorithm(graph);
+        System.out.println("Edge connection count\n");
+        da.printConnectionCount();
+        da.execute(nodeList.get(0));
+        System.out.println(da.getPath(nodeList.get(7)));
+
+    }
+
     public void execute(NodeDescriptor source)
     {
         settledNodes = new HashSet<>();
@@ -35,7 +85,6 @@ public class DijkstraAlgorithm
             unSettledNodes.remove(node);
             findMinimalDistances(node);
         }
-
     }
 
     private void findMinimalDistances(NodeDescriptor node)
@@ -140,55 +189,5 @@ public class DijkstraAlgorithm
             }
         }
         return minimum;
-    }
-
-    public static void main(String args[])
-    {
-        ArrayList<NodeDescriptor> nodeList = new ArrayList<>();
-        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9000));
-        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9001));
-        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9002));
-        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9003));
-        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9004));
-        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9005));
-        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9006));
-        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9007));
-        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9008));
-        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9009));
-        nodeList.add(new NodeDescriptor(0, "127.0.0.1", 9010));
-
-//        ArrayList<Edge> edgeList = new ArrayList<>();
-//        Random random = new Random();
-//
-//        edgeList.add(new Edge(nodeList.get(0), nodeList.get(1), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(0), nodeList.get(2), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(0), nodeList.get(3), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(0), nodeList.get(4), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(1), nodeList.get(2), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(2), nodeList.get(3), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(3), nodeList.get(4), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(4), nodeList.get(5), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(5), nodeList.get(6), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(6), nodeList.get(7), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(7), nodeList.get(8), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(8), nodeList.get(9), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(9), nodeList.get(4), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(4), nodeList.get(2), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(5), nodeList.get(7), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(6), nodeList.get(9), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(7), nodeList.get(2), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(8), nodeList.get(3), random.nextInt(10)+1));
-//        edgeList.add(new Edge(nodeList.get(9), nodeList.get(4), random.nextInt(10)+1));
-
-//        System.out.println(edgeList);
-        Graph graph = new Graph(nodeList, 4);
-        System.out.println(graph.getEdges());
-
-        DijkstraAlgorithm da = new DijkstraAlgorithm(graph);
-        System.out.println("Edge connection count\n");
-        da.printConnectionCount();
-        da.execute(nodeList.get(0));
-        System.out.println(da.getPath(nodeList.get(3)));
-
     }
 }

@@ -1,6 +1,6 @@
 package cs455.overlay.wireformats;
 
-import cs455.overlay.dijkstra.NodeWeight;
+import cs455.overlay.dijkstra.Edge;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ public class LinkWeights implements Event
 {
     private final int type = MessageType.LINK_WEIGHTS;
     public int numberOfLinks;
-    public ArrayList<NodeWeight> nodeWeights;
+    public ArrayList<Edge> nodeWeights;
 
 
     public LinkWeights()
@@ -36,7 +36,7 @@ public class LinkWeights implements Event
             int nodeWeightLength = din.readInt();
             byte[] nodeWeightBytes = new byte[nodeWeightLength];
             din.readFully(nodeWeightBytes);
-            this.nodeWeights.add(new NodeWeight(nodeWeightBytes));
+            this.nodeWeights.add(new Edge(nodeWeightBytes));
         }
 
         baInputStream.close();
@@ -60,9 +60,9 @@ public class LinkWeights implements Event
 
         dout.writeInt(this.numberOfLinks);
 
-        for (NodeWeight nw : nodeWeights)
+        for (Edge edge : nodeWeights)
         {
-            String nwString = nw.toString();
+            String nwString = edge.toString();
             byte[] nwBytes = nwString.getBytes();
             int nwLength = nwBytes.length;
             dout.writeInt(nwLength);

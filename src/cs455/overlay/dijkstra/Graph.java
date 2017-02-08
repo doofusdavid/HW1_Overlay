@@ -102,9 +102,41 @@ public class Graph
         }
     }
 
+    public Graph(ArrayList<Edge> edges)
+    {
+        ArrayList<NodeDescriptor> nodes = new ArrayList<>();
+
+        // first, get all the distinct nodes
+        for (Edge edge : edges)
+        {
+            if (!nodes.contains(edge.getSource()))
+            {
+                nodes.add(edge.getSource());
+            }
+        }
+        this.vertexes = new ArrayList<>(nodes);
+        this.edges = new ArrayList<>();
+
+        for (Edge edge : edges)
+        {
+            this.edges.add(new Edge(edge.getSource(), edge.getDestination(), edge.getWeight()));
+        }
+
+    }
+
     public List<NodeDescriptor> getVertexes()
     {
         return vertexes;
+    }
+
+    public int getOrder()
+    {
+        return this.vertexes.size();
+    }
+
+    public int getSize()
+    {
+        return this.edges.size();
     }
 
     /**
@@ -127,5 +159,13 @@ public class Graph
     public List<Edge> getEdges()
     {
         return edges;
+    }
+
+    public void printEdges()
+    {
+        for (Edge edge : edges)
+        {
+            System.out.println(edge);
+        }
     }
 }
