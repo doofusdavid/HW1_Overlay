@@ -146,7 +146,7 @@ public class Registry implements Node
 
                     break;
                 default:
-                    System.out.println("Unknown command.\nKnown commands are\n list-messaging-nodes\nlist-weights\nsetup-overlay <numConnections>\nstart <numRounds>\nsend-overlay-link-weights\nprint-shortest-path\nexit-overlay");
+                    System.out.println("Unknown command.\nKnown commands are\nlist-messaging-nodes\nlist-weights\nsetup-overlay <numConnections>\nstart <numRounds>\nsend-overlay-link-weights\nprint-shortest-path\nexit-overlay");
                     break;
             }
         }

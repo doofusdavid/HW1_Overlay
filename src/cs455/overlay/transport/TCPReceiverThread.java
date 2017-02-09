@@ -5,6 +5,7 @@ import cs455.overlay.wireformats.EventFactory;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -32,7 +33,7 @@ public class TCPReceiverThread implements Runnable
             this.serverSocket = new ServerSocket(port);
             this.port = this.serverSocket.getLocalPort();
             this.node = node;
-            System.out.println(String.format("TCPReceiverThread running on %s", this.serverSocket.getInetAddress().toString()));
+            System.out.println(String.format("TCPReceiverThread running on %s:%d", InetAddress.getLocalHost().getHostAddress(), this.port));
         }
         catch (IOException ioe)
         {

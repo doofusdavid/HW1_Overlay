@@ -8,6 +8,7 @@ import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.IPChecker;
 import cs455.overlay.util.NotImplementedException;
+import cs455.overlay.util.StringUtil;
 import cs455.overlay.wireformats.*;
 
 import java.io.IOException;
@@ -105,6 +106,11 @@ public class MessagingNode implements Node
         while(true)
         {
             String input = in.nextLine();
+            if (input.startsWith("connect"))
+            {
+                node.TestSendToNode(input);
+                continue;
+            }
             switch (input)
             {
                 case "print-shortest-path":
@@ -127,6 +133,21 @@ public class MessagingNode implements Node
         }
     }
 
+    private void TestSendToNode(String input)
+    {
+        int port = StringUtil.getIntFromStringCommand(input);
+        ArrayList<NodeDescriptor> path = new ArrayList<>();
+        path.add(new NodeDescriptor(this.hostIPAddress, this.hostPort));
+        NodeDescriptor sink = new NodeDescriptor(this.hostIPAddress, port);
+
+        Message message = new Message(new NodeDescriptor(this.hostIPAddress, this.hostPort),
+                sink,
+                12312,
+                path);
+
+        SendMessageToNode(message, sink);
+    }
+
     private void SendRegistrationRequest()
     {
         try
@@ -139,6 +160,7 @@ public class MessagingNode implements Node
             registerRequestMessage.Port = this.hostPort;
 
             sender.sendData(registerRequestMessage.getBytes());
+            registrySocket = null;
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());
@@ -157,7 +179,7 @@ public class MessagingNode implements Node
             deregisterRequestMessage.IPAddress = this.hostIPAddress;
 
             sender.sendData(deregisterRequestMessage.getBytes());
-
+            registrySocket = null;
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());
@@ -217,6 +239,7 @@ public class MessagingNode implements Node
         }
         if (event instanceof Message)
         {
+            System.out.println("Received Message\nCurrent Receipts:" + this.receiveTracker);
             this.ReceiveMessage((Message) event);
         }
         if (event instanceof TaskInitiate)
@@ -232,7 +255,7 @@ public class MessagingNode implements Node
         for (Edge edge : this.edges)
         {
             // we only want other nodes, not our self
-            if (edge.getSource().IPAddress == this.hostIPAddress && edge.getSource().Port == this.hostPort)
+            if (edge.getSource().IPAddress.equals(this.hostIPAddress) && edge.getSource().Port == this.hostPort)
                 continue;
 
             // get a list of the other nodes we can use as sinks.
@@ -248,24 +271,25 @@ public class MessagingNode implements Node
         Random random = new Random();
         SetOtherNodeList();
 
-        for (int i = 0; i < rounds; rounds++)
+        for (int i = 0; i < rounds; i++)
         {
             int nodeNum = random.nextInt(this.otherNodes.size());
             SendMessage(this.otherNodes.get(nodeNum));
         }
     }
 
-    private void SendMessageToNode(Message message, NodeDescriptor node)
+    private synchronized void SendMessageToNode(Message message, NodeDescriptor node)
     {
         try
         {
-            System.out.println(String.format("Sending Message to : %s:%d", node.IPAddress, node.Port));
-            Socket registrySocket = new Socket(node.IPAddress, node.Port);
-            TCPSender sender = new TCPSender(registrySocket);
+            System.out.println(String.format("Sending Message from %s:%d to : %s:%d", this.hostIPAddress, this.hostPort, node.IPAddress, node.Port));
+            Socket nodeSocket = new Socket(node.IPAddress, node.Port);
+            TCPSender sender = new TCPSender(nodeSocket);
 
             sender.sendData(message.getBytes());
             this.incrementSentCounter();
             this.addSentSummation(message.getPayload());
+            nodeSocket = null;
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());
@@ -285,8 +309,7 @@ public class MessagingNode implements Node
         Message message = new Message(source, sinkNode, payload, nodePath);
 
         // Send to the first item in the path list
-        SendMessageToNode(message, nodePath.get(0));
-
+        SendMessageToNode(message, nodePath.get(1));
 
     }
     private void ReceiveMessage(Message event)
@@ -301,7 +324,6 @@ public class MessagingNode implements Node
             this.addReceiveSummation(event.getPayload());
             return;
         }
-
         // Find the next node in the routing path
         ListIterator<NodeDescriptor> node = route.listIterator();
         NodeDescriptor nextNode = null;
@@ -311,6 +333,7 @@ public class MessagingNode implements Node
             if (current == me)
             {
                 nextNode = node.next();
+                System.out.println("Message received, routing to " + nextNode);
                 break;
             }
         }
