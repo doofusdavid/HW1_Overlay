@@ -55,17 +55,21 @@ public class TCPReceiverThread implements Runnable
             try
             {
                 Socket socket = serverSocket.accept();
+                //System.out.println("Port: " + getPort() + " received data.");
                 while(socket!=null)
                 {
                     try
                     {
                         din = new DataInputStream(socket.getInputStream());
                         dataLength = din.readInt();
+                        //System.out.println("datalength: " + dataLength);
 
                         byte[] data = new byte[dataLength];
                         din.readFully(data, 0, dataLength);
                         EventFactory ef = EventFactory.getInstance();
+                        //System.out.println("got instance");
                         ef.FireEvent(data, this.node);
+                        //System.out.println("Event Fired");
                         socket = null;
                     } catch (SocketException se)
                     {

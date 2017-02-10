@@ -32,10 +32,6 @@ public class RegisterResponse implements Event
 
         this.additionalInfo = new String (aiBytes);
 
-        int ipLength = din.readInt();
-        byte[] ipBytes = new byte[ipLength];
-        din.readFully(ipBytes);
-
         baInputStream.close();
         din.close();
 

@@ -253,11 +253,19 @@ public class Registry implements Node
         if(event instanceof RegisterRequest)
         {
             RegisterNode((RegisterRequest)event);
-        }
-        else if(event instanceof DeregisterRequest)
+        } else if(event instanceof DeregisterRequest)
         {
             DeRegisterNode((DeregisterRequest) event);
+        } else if (event instanceof TaskComplete)
+        {
+            NodeTaskComplete((TaskComplete) event);
         }
+    }
+
+    private void NodeTaskComplete(TaskComplete event)
+    {
+        NodeDescriptor nd = new NodeDescriptor(event.getIPAddress(), event.getPort());
+        System.out.println("Node Task Complete: " + nd.toString());
     }
 
     private void DeRegisterNode(DeregisterRequest event)

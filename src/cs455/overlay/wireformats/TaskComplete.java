@@ -66,10 +66,12 @@ public class TaskComplete implements Event
 
         dout.writeInt(this.type);
 
-        byte[] ipBytes = IPAddress.getBytes();
+        byte[] ipBytes = this.IPAddress.getBytes();
         int ipLength = ipBytes.length;
         dout.writeInt(ipLength);
         dout.write(ipBytes);
+
+        dout.writeInt(this.Port);
 
         dout.flush();
         marshalledBytes = baOutputStream.toByteArray();

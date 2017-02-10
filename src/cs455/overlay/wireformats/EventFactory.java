@@ -21,7 +21,7 @@ public class EventFactory
 
         // The length has been trimmed off, so we're just going to start with messageType
         int messageType = byteBuffer.getInt();
-
+        System.out.println("messageType:" + messageType);
         try
         {
             Event message;
@@ -67,6 +67,11 @@ public class EventFactory
                     message = new TaskInitiate(data);
                     break;
                 }
+                case MessageType.TASK_COMPLETE:
+                {
+                    message = new TaskComplete(data);
+                    break;
+                }
                 default:
                     System.out.println("Event Factory: Unknown messageType.  Exiting.");
                     return;
@@ -75,7 +80,7 @@ public class EventFactory
 
         } catch (IOException ioe)
         {
-            System.out.println(ioe.getMessage());
+            System.out.println("EventFactory.FireEvent " + ioe.getMessage());
         }
     }
 }

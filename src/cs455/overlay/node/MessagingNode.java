@@ -95,8 +95,6 @@ public class MessagingNode implements Node
 
         MessagingNode node = new MessagingNode(registryIPAddress, registryPort);
 
-        System.out.println("Node Started and awaiting orders.");
-
         ProcessInput(node);
     }
 
@@ -275,10 +273,35 @@ public class MessagingNode implements Node
         {
             int nodeNum = random.nextInt(this.otherNodes.size());
             SendMessage(this.otherNodes.get(nodeNum));
+            try
+            {
+                Thread.sleep(10);
+            } catch (Exception e)
+            {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        SendTaskComplete();
+    }
+
+    private void SendTaskComplete()
+    {
+        try
+        {
+            System.out.println("Sending Task Complete");
+            TaskComplete message = new TaskComplete(this.hostIPAddress, this.hostPort);
+
+            Socket registrySocket = new Socket(registryIPAddress, registryPort);
+            TCPSender sender = new TCPSender(registrySocket);
+            sender.sendData(message.getBytes());
+        } catch (IOException ioe)
+        {
+            System.out.println("SendTaskComplete: " + ioe.getMessage());
         }
     }
 
-    private synchronized void SendMessageToNode(Message message, NodeDescriptor node)
+    private void SendMessageToNode(Message message, NodeDescriptor node)
     {
         try
         {
