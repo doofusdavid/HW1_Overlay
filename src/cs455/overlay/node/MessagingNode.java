@@ -335,7 +335,7 @@ public class MessagingNode implements Node
             SendMessage(this.otherNodes.get(nodeNum));
             try
             {
-                Thread.sleep(10);
+                Thread.sleep(100);
             } catch (Exception e)
             {
                 System.out.println(e.getMessage());
@@ -413,7 +413,7 @@ public class MessagingNode implements Node
         while (node.hasNext())
         {
             NodeDescriptor current = node.next();
-            if (current == me)
+            if (current.equals(me))
             {
                 nextNode = node.next();
                 System.out.println("Message received, routing to " + nextNode);
