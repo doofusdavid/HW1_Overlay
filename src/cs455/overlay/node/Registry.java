@@ -26,6 +26,8 @@ public class Registry implements Node
     private String registryIPAddress;
     private ArrayList<NodeDescriptor> nodeList;
     private Graph overlay;
+    private ArrayList<TrafficSummary> trafficSummaryList;
+    private ArrayList<NodeDescriptor> completedNodeList;
 
     private Registry(int port)
     {
@@ -166,7 +168,7 @@ public class Registry implements Node
     {
         try
         {
-            System.out.println("Sending StartConnection to" + node.toString());
+            System.out.println("Sending StartConnection to " + node.toString());
             Socket socket = new Socket(node.IPAddress, node.Port);
             TCPSender sender = new TCPSender(socket);
 
@@ -213,7 +215,6 @@ public class Registry implements Node
 
     public void RegisterNode(RegisterRequest request)
     {
-        System.out.println("Register Request Fired");
         if(this.nodeList.contains(request.Port))
         {
             // Node already registered, send a Failure response
@@ -253,19 +254,113 @@ public class Registry implements Node
         if(event instanceof RegisterRequest)
         {
             RegisterNode((RegisterRequest)event);
-        } else if(event instanceof DeregisterRequest)
+        }
+        if (event instanceof DeregisterRequest)
         {
             DeRegisterNode((DeregisterRequest) event);
-        } else if (event instanceof TaskComplete)
+        }
+        if (event instanceof TaskComplete)
         {
             NodeTaskComplete((TaskComplete) event);
         }
+        if (event instanceof TrafficSummary)
+        {
+            ProcessTrafficSummary((TrafficSummary) event);
+        }
+    }
+
+    private void ProcessTrafficSummary(TrafficSummary event)
+    {
+        if (event == null)
+            return;
+
+        if (this.trafficSummaryList == null)
+        {
+            this.trafficSummaryList = new ArrayList<>();
+        }
+
+        this.trafficSummaryList.add(event);
+
+        if (this.trafficSummaryList.size() == this.nodeList.size())
+        {
+            DisplayTrafficSummary();
+        }
+    }
+
+    private void DisplayTrafficSummary()
+    {
+        int SentCountTotal = 0;
+        int RcvCountTotal = 0;
+        int RelayCountTotal = 0;
+        long SentSum = 0;
+        long RcvSum = 0;
+
+        System.out.println("\t\t\t\tSent Count\tRcv Count\tSum Sent\tSum Rcv\tRelay Count");
+        for (TrafficSummary ts : this.trafficSummaryList)
+        {
+            NodeDescriptor nd = new NodeDescriptor(ts.getIPAddress(), ts.getPort());
+            System.out.println(String.format("%s\t%d\t%d\t%d\t%d\t%d", nd.toString(),
+                    ts.getMessageSentCount(),
+                    ts.getMessageReceivedCount(),
+                    ts.getMessageSentSummary(),
+                    ts.getMessageReceivedSummary(),
+                    ts.getMessageRelayedCount()));
+
+            SentCountTotal += ts.getMessageSentCount();
+            RcvCountTotal += ts.getMessageReceivedCount();
+            RelayCountTotal += ts.getMessageRelayedCount();
+            SentSum += ts.getMessageSentSummary();
+            RcvSum += ts.getMessageReceivedSummary();
+        }
+
+        System.out.println(String.format("Sum\t\t\t\t%d\t%d\t%d\t%d\t%d",
+                SentCountTotal,
+                RcvCountTotal,
+                SentSum,
+                RcvSum,
+                RelayCountTotal));
     }
 
     private void NodeTaskComplete(TaskComplete event)
     {
+        if (this.completedNodeList == null)
+            this.completedNodeList = new ArrayList<>();
+
         NodeDescriptor nd = new NodeDescriptor(event.getIPAddress(), event.getPort());
+        this.completedNodeList.add(nd);
         System.out.println("Node Task Complete: " + nd.toString());
+
+        if (this.completedNodeList.size() == this.nodeList.size())
+        {
+            SendPullTrafficSummaries();
+        }
+    }
+
+    private void SendPullTrafficSummaries()
+    {
+        for (NodeDescriptor node : this.nodeList)
+        {
+            SendPullTrafficSummary(node);
+        }
+    }
+
+    private void SendPullTrafficSummary(NodeDescriptor node)
+    {
+        try
+        {
+            System.out.println(String.format("Sending PullTrafficSummary to %s:%d", node.IPAddress, node.Port));
+            Socket socket = new Socket(node.IPAddress, node.Port);
+            TCPSender sender = new TCPSender(socket);
+
+            PullTrafficSummary message = new PullTrafficSummary();
+
+            sender.sendData(message.getBytes());
+
+        } catch (IOException ioe)
+        {
+            System.out.println(ioe.getMessage());
+        }
+
     }
 
     private void DeRegisterNode(DeregisterRequest event)

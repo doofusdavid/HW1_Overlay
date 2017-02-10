@@ -24,6 +24,11 @@ public class PullTrafficSummary implements Event
 
     }
 
+    public PullTrafficSummary()
+    {
+
+    }
+
     @Override
     public byte[] getBytes() throws IOException
     {

@@ -210,11 +210,11 @@ public class MessagingNode implements Node
     {
         this.receiveTracker++;
     }
-
     private synchronized void incrementRelayCounter()
     {
         this.relayTracker++;
     }
+
     private synchronized void addReceiveSummation(int value)
     {
         this.receiveSummation += value;
@@ -222,6 +222,31 @@ public class MessagingNode implements Node
     private synchronized void addSentSummation(int value)
     {
         this.sendSummation += value;
+    }
+
+    private synchronized void clearSentCounter()
+    {
+        this.sendTracker = 0;
+    }
+
+    private synchronized void clearReceivedCounter()
+    {
+        this.receiveTracker = 0;
+    }
+
+    private synchronized void clearRelayCounter()
+    {
+        this.relayTracker = 0;
+    }
+
+    private synchronized void clearReceivedSummation()
+    {
+        this.receiveSummation = 0;
+    }
+
+    private synchronized void clearSendSummation()
+    {
+        this.sendSummation = 0;
     }
 
     @Override
@@ -243,6 +268,41 @@ public class MessagingNode implements Node
         if (event instanceof TaskInitiate)
         {
             this.InitiateTask((TaskInitiate) event);
+        }
+        if (event instanceof PullTrafficSummary)
+        {
+            this.PullTrafficSummary();
+        }
+    }
+
+    private void PullTrafficSummary()
+    {
+
+        try
+        {
+            System.out.println("Sending TrafficSummary");
+            TrafficSummary message = new TrafficSummary(this.hostIPAddress,
+                    this.hostPort,
+                    this.sendTracker,
+                    this.sendSummation,
+                    this.receiveTracker,
+                    this.receiveSummation,
+                    this.relayTracker);
+
+            Socket registrySocket = new Socket(registryIPAddress, registryPort);
+            TCPSender sender = new TCPSender(registrySocket);
+            sender.sendData(message.getBytes());
+
+            // Clear all counters
+            clearSentCounter();
+            clearReceivedCounter();
+            clearRelayCounter();
+            clearReceivedSummation();
+            clearSendSummation();
+
+        } catch (IOException ioe)
+        {
+            System.out.println("PullTrafficSummary: " + ioe.getMessage());
         }
     }
 

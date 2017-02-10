@@ -56,6 +56,41 @@ public class TrafficSummary implements Event
 
     }
 
+    public String getIPAddress()
+    {
+        return IPAddress;
+    }
+
+    public int getPort()
+    {
+        return Port;
+    }
+
+    public int getMessageSentCount()
+    {
+        return MessageSentCount;
+    }
+
+    public long getMessageSentSummary()
+    {
+        return MessageSentSummary;
+    }
+
+    public int getMessageReceivedCount()
+    {
+        return MessageReceivedCount;
+    }
+
+    public long getMessageReceivedSummary()
+    {
+        return MessageReceivedSummary;
+    }
+
+    public int getMessageRelayedCount()
+    {
+        return MessageRelayedCount;
+    }
+
     @Override
     public int getType()
     {

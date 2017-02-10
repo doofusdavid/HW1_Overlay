@@ -72,6 +72,11 @@ public class EventFactory
                     message = new TaskComplete(data);
                     break;
                 }
+                case MessageType.TRAFFIC_SUMMARY:
+                {
+                    message = new TrafficSummary(data);
+                    break;
+                }
                 default:
                     System.out.println("Event Factory: Unknown messageType.  Exiting.");
                     return;
