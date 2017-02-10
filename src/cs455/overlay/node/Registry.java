@@ -98,7 +98,7 @@ public class Registry implements Node
                 if(connectionCount < 1)
                 {
                     System.out.println("Received setup-overlay with invalid parameters.  setup-overlay <number-of-connections>");
-                    break;
+                    continue;
                 }
                 else
                 {
@@ -117,7 +117,7 @@ public class Registry implements Node
                 if(roundCount < 1)
                 {
                     System.out.println("Received Start command with invalid parameters.  Please try 'start <number of rounds>");
-                    break;
+                    continue;
                 }
                 else
                 {
@@ -299,7 +299,7 @@ public class Registry implements Node
         for (TrafficSummary ts : this.trafficSummaryList)
         {
             NodeDescriptor nd = new NodeDescriptor(ts.getIPAddress(), ts.getPort());
-            System.out.println(String.format("%s\t%d\t%d\t%d\t%d\t%d", nd.toString(),
+            System.out.println(String.format("%s\t%d\t\t\t%d\t\t%d\t%d\t%d", nd.toString(),
                     ts.getMessageSentCount(),
                     ts.getMessageReceivedCount(),
                     ts.getMessageSentSummary(),
@@ -313,7 +313,7 @@ public class Registry implements Node
             RcvSum += ts.getMessageReceivedSummary();
         }
 
-        System.out.println(String.format("Sum\t\t\t\t%d\t%d\t%d\t%d\t%d",
+        System.out.println(String.format("Sum\t\t\t\t\t%d\t\t\t%d\t\t%d\t%d\t%d",
                 SentCountTotal,
                 RcvCountTotal,
                 SentSum,

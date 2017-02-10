@@ -400,7 +400,7 @@ public class MessagingNode implements Node
         this.incrementReceivedCounter();
         ArrayList<NodeDescriptor> route = event.getRoutingPath();
         NodeDescriptor me = new NodeDescriptor(0, this.hostIPAddress, this.hostPort);
-        if (event.getDestination() == me)
+        if (event.getDestination().equals(me))
         {
             // We've reached the destination!
             System.out.println("Message received destination");
@@ -423,6 +423,7 @@ public class MessagingNode implements Node
         if (nextNode != null)
         {
             this.incrementRelayCounter();
+            System.out.println("increment relay counter");
             this.SendMessageToNode(event, nextNode);
         }
     }
