@@ -21,7 +21,7 @@ public class EventFactory
 
         // The length has been trimmed off, so we're just going to start with messageType
         int messageType = byteBuffer.getInt();
-        System.out.println("messageType:" + messageType);
+        //System.out.println("messageType:" + messageType);
         try
         {
             Event message;
