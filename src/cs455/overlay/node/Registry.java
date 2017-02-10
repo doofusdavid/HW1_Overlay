@@ -148,7 +148,7 @@ public class Registry implements Node
 
                     break;
                 default:
-                    System.out.println("Unknown command.\nKnown commands are\nlist-messaging-nodes\nlist-weights\nsetup-overlay <numConnections>\nstart <numRounds>\nsend-overlay-link-weights\nprint-shortest-path\nexit-overlay");
+                    System.out.println("Unknown command.\nKnown commands are\nlist-messaging-nodes\nlist-weights\nsetup-overlay <numConnections>\nstart <numRounds>\nsend-overlay-link-weights");
                     break;
             }
         }
@@ -295,7 +295,7 @@ public class Registry implements Node
         long SentSum = 0;
         long RcvSum = 0;
 
-        System.out.println("\t\t\t\tSent Count\tRcv Count\tSum Sent\tSum Rcv\tRelay Count");
+        System.out.println("\t\t\tSent Count\tRcv Count\tSum Sent\tSum Rcv\tRelay Count");
         for (TrafficSummary ts : this.trafficSummaryList)
         {
             NodeDescriptor nd = new NodeDescriptor(ts.getIPAddress(), ts.getPort());
@@ -313,7 +313,7 @@ public class Registry implements Node
             RcvSum += ts.getMessageReceivedSummary();
         }
 
-        System.out.println(String.format("Sum\t\t\t\t\t%d\t\t\t%d\t\t%d\t%d\t%d",
+        System.out.println(String.format("Sum\t\t\t%d\t\t\t%d\t\t%d\t%d\t%d",
                 SentCountTotal,
                 RcvCountTotal,
                 SentSum,
