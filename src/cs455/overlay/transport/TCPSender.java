@@ -26,6 +26,8 @@ public class TCPSender
 
         dout.write(dataToSend,0,dataLength);
         dout.flush();
+        dout.close();
+        this.socket.close();
 
     }
 }

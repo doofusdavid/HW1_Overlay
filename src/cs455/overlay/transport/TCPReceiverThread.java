@@ -48,19 +48,11 @@ public class TCPReceiverThread implements Runnable
     {
         int dataLength;
 
-        while(true)
+        while (!Thread.currentThread().isInterrupted())
         {
             try
             {
                 Socket socket = serverSocket.accept();
-            } catch (IOException ie)
-            {
-                System.out.println(ie.getMessage());
-                break;
-            }
-            //System.out.println("Port: " + getPort() + " received data.");
-            try
-            {
                 din = new DataInputStream(socket.getInputStream());
                 dataLength = din.readInt();
                 //System.out.println("datalength: " + dataLength);
@@ -75,7 +67,7 @@ public class TCPReceiverThread implements Runnable
             } catch (Exception e)
             {
                 System.out.println("TCPReceiverThread: " + e.getMessage());
-                break;
+                e.printStackTrace();
                 }
         }
     }

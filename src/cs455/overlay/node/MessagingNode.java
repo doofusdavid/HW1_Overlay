@@ -328,7 +328,6 @@ public class MessagingNode implements Node
         int rounds = event.rounds;
         Random random = new Random();
         SetOtherNodeList();
-
         for (int i = 0; i < rounds; i++)
         {
             int nodeNum = random.nextInt(this.otherNodes.size());
@@ -375,10 +374,10 @@ public class MessagingNode implements Node
 //            Thread t = new Thread(senderThread);
 //            t.start();
 
-            sender.sendData(message.getBytes());
-            nodeSocket.close();
             this.incrementSentCounter();
             this.addSentSummation(message.getPayload());
+            sender.sendData(message.getBytes());
+            nodeSocket.close();
         } catch (IOException ioe)
         {
             System.out.println("SendMessageToNode: " + ioe.getMessage());
