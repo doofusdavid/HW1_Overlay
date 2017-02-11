@@ -95,7 +95,7 @@ public class MessagingNode implements Node
 
         MessagingNode node = new MessagingNode(registryIPAddress, registryPort);
 
-        ProcessInput(node);
+        //ProcessInput(node);
     }
 
     private static void ProcessInput(MessagingNode node)
@@ -158,7 +158,7 @@ public class MessagingNode implements Node
             registerRequestMessage.Port = this.hostPort;
 
             sender.sendData(registerRequestMessage.getBytes());
-            registrySocket = null;
+            registrySocket.close();
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());
@@ -177,7 +177,7 @@ public class MessagingNode implements Node
             deregisterRequestMessage.IPAddress = this.hostIPAddress;
 
             sender.sendData(deregisterRequestMessage.getBytes());
-            registrySocket = null;
+            registrySocket.close();
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());
@@ -299,7 +299,7 @@ public class MessagingNode implements Node
             clearRelayCounter();
             clearReceivedSummation();
             clearSendSummation();
-
+            registrySocket.close();
         } catch (IOException ioe)
         {
             System.out.println("PullTrafficSummary: " + ioe.getMessage());
@@ -355,27 +355,33 @@ public class MessagingNode implements Node
             Socket registrySocket = new Socket(registryIPAddress, registryPort);
             TCPSender sender = new TCPSender(registrySocket);
             sender.sendData(message.getBytes());
+            registrySocket.close();
         } catch (IOException ioe)
         {
             System.out.println("SendTaskComplete: " + ioe.getMessage());
         }
     }
 
-    private void SendMessageToNode(Message message, NodeDescriptor node)
+    private synchronized void SendMessageToNode(Message message, NodeDescriptor node)
     {
         try
         {
-            System.out.println(String.format("Sending Message from %s:%d to : %s:%d", this.hostIPAddress, this.hostPort, node.IPAddress, node.Port));
+            //System.out.println(String.format("Sending Message from %s:%d to : %s:%d", this.hostIPAddress, this.hostPort, node.IPAddress, node.Port));
+
             Socket nodeSocket = new Socket(node.IPAddress, node.Port);
             TCPSender sender = new TCPSender(nodeSocket);
 
+//            TCPSenderThread senderThread = new TCPSenderThread(node.IPAddress, node.Port, message.getBytes());
+//            Thread t = new Thread(senderThread);
+//            t.start();
+
             sender.sendData(message.getBytes());
+            nodeSocket.close();
             this.incrementSentCounter();
             this.addSentSummation(message.getPayload());
-            nodeSocket = null;
         } catch (IOException ioe)
         {
-            System.out.println(ioe.getMessage());
+            System.out.println("SendMessageToNode: " + ioe.getMessage());
         }
 
     }
@@ -392,7 +398,7 @@ public class MessagingNode implements Node
         Message message = new Message(source, sinkNode, payload, nodePath);
 
         // Send to the first item in the path list
-        SendMessageToNode(message, nodePath.get(1));
+        this.SendMessageToNode(message, nodePath.get(1));
 
     }
     private void ReceiveMessage(Message event)
@@ -403,7 +409,7 @@ public class MessagingNode implements Node
         if (event.getDestination().equals(me))
         {
             // We've reached the destination!
-            System.out.println("Message received destination");
+            //System.out.println("Message received destination");
             this.addReceiveSummation(event.getPayload());
             return;
         }
@@ -416,14 +422,14 @@ public class MessagingNode implements Node
             if (current.equals(me))
             {
                 nextNode = node.next();
-                System.out.println("Message received, routing to " + nextNode);
+                //System.out.println("Message received, routing to " + nextNode);
                 break;
             }
         }
         if (nextNode != null)
         {
             this.incrementRelayCounter();
-            System.out.println("increment relay counter");
+            //System.out.println("increment relay counter");
             this.SendMessageToNode(event, nextNode);
         }
     }

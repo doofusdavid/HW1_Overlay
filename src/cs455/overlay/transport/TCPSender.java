@@ -15,6 +15,7 @@ public class TCPSender
     public TCPSender(Socket socket) throws IOException
     {
         this.socket = socket;
+        this.socket.setTcpNoDelay(true);
         dout = new DataOutputStream(socket.getOutputStream());
     }
 

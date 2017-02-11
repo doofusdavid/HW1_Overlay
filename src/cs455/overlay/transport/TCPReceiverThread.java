@@ -5,10 +5,8 @@ import cs455.overlay.wireformats.EventFactory;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 
 public class TCPReceiverThread implements Runnable
 {
@@ -30,10 +28,10 @@ public class TCPReceiverThread implements Runnable
         try
         {
             // Passing a 0 auto-allocates a port
-            this.serverSocket = new ServerSocket(port);
+            this.serverSocket = new ServerSocket(port, 10000);
             this.port = this.serverSocket.getLocalPort();
             this.node = node;
-            System.out.println(String.format("TCPReceiverThread running on %s:%d", InetAddress.getLocalHost().getHostAddress(), this.port));
+            //System.out.println(String.format("TCPReceiverThread running on %s:%d", InetAddress.getLocalHost().getHostAddress(), this.port));
         }
         catch (IOException ioe)
         {
@@ -55,33 +53,30 @@ public class TCPReceiverThread implements Runnable
             try
             {
                 Socket socket = serverSocket.accept();
-                System.out.println("Port: " + getPort() + " received data.");
-                while(socket!=null)
-                {
-                    try
-                    {
-                        din = new DataInputStream(socket.getInputStream());
-                        dataLength = din.readInt();
-                        //System.out.println("datalength: " + dataLength);
-
-                        byte[] data = new byte[dataLength];
-                        din.readFully(data, 0, dataLength);
-                        EventFactory ef = EventFactory.getInstance();
-                        //System.out.println("got instance");
-                        EventFactory.FireEvent(data, this.node);
-                        //System.out.println("Event Fired");
-                        socket = null;
-                    } catch (SocketException se)
-                    {
-                        System.out.println(se.getMessage());
-                        break;
-                    }
-                }
             } catch (IOException ie)
             {
                 System.out.println(ie.getMessage());
                 break;
             }
+            //System.out.println("Port: " + getPort() + " received data.");
+            try
+            {
+                din = new DataInputStream(socket.getInputStream());
+                dataLength = din.readInt();
+                //System.out.println("datalength: " + dataLength);
+
+                byte[] data = new byte[dataLength];
+                din.readFully(data, 0, dataLength);
+                din.close();
+                socket.close();
+                EventFactory ef = EventFactory.getInstance();
+                ef.FireEvent(data, this.node);
+
+            } catch (Exception e)
+            {
+                System.out.println("TCPReceiverThread: " + e.getMessage());
+                break;
+                }
         }
     }
 

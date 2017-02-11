@@ -176,7 +176,7 @@ public class Registry implements Node
             taskInitiate.rounds = rounds;
 
             sender.sendData(taskInitiate.getBytes());
-
+            socket.close();
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());
@@ -241,7 +241,7 @@ public class Registry implements Node
             response.additionalInfo = message;
 
             sender.sendData(response.getBytes());
-
+            socket.close();
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());
@@ -355,7 +355,7 @@ public class Registry implements Node
             PullTrafficSummary message = new PullTrafficSummary();
 
             sender.sendData(message.getBytes());
-
+            socket.close();
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());
@@ -392,7 +392,7 @@ public class Registry implements Node
             response.additionalInfo = message;
 
             sender.sendData(response.getBytes());
-
+            socket.close();
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());
@@ -412,7 +412,7 @@ public class Registry implements Node
             message.numberOfLinks = weights.size();
 
             sender.sendData(message.getBytes());
-
+            socket.close();
         } catch (IOException ioe)
         {
             System.out.println(ioe.getMessage());
