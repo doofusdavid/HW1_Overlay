@@ -49,6 +49,16 @@ public class MessagingNodesList implements Event
 
     }
 
+    public int getNumberOfPeers()
+    {
+        return numberOfPeers;
+    }
+
+    public ArrayList<NodeDescriptor> getNeighborNodes()
+    {
+        return neighborNodes;
+    }
+
     @Override
     public int getType()
     {

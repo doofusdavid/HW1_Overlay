@@ -1,5 +1,6 @@
 package cs455.overlay.node;
 
+import cs455.overlay.dijkstra.DijkstraAlgorithm;
 import cs455.overlay.dijkstra.Edge;
 import cs455.overlay.dijkstra.Graph;
 import cs455.overlay.dijkstra.NodeDescriptor;
@@ -13,6 +14,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 /**
@@ -28,6 +30,8 @@ public class Registry implements Node
     private Graph overlay;
     private ArrayList<TrafficSummary> trafficSummaryList;
     private ArrayList<NodeDescriptor> completedNodeList;
+    private ArrayList<NodeDescriptor> nodesToSend;
+    private int roundCount;
 
     private Registry(int port)
     {
@@ -121,6 +125,7 @@ public class Registry implements Node
                 }
                 else
                 {
+                    registry.setRoundCount(roundCount);
                     registry.StartConnections(roundCount);
                     continue;
                 }
@@ -185,16 +190,52 @@ public class Registry implements Node
 
     private void StartConnections(int roundCount)
     {
-        // Send it
-        for (NodeDescriptor node : nodeList)
-        {
-            this.SendStartConnection(node, roundCount);
-        }
+        // Nodes to send is the queue of nodes
+        this.nodesToSend = new ArrayList<>(this.nodeList);
+
+        // Randomize them for fun
+        Collections.shuffle(this.nodesToSend);
+
+        NodeDescriptor firstNode = this.nodesToSend.remove(0);
+        this.SendStartConnection(firstNode, roundCount);
     }
 
     private void SetupOverlay(int connectionCount)
     {
         this.overlay = new Graph(nodeList, connectionCount);
+        this.SendMessagingNodesList();
+    }
+
+    private void SendMessagingNodesList()
+    {
+        if (this.nodeList.size() == 0)
+        {
+            System.out.println("Send Messaging Nodes List: No nodes registered");
+        } else
+        {
+            DijkstraAlgorithm da = new DijkstraAlgorithm(this.overlay);
+            for (NodeDescriptor node : this.nodeList)
+            {
+                da.execute(node);
+                ArrayList<NodeDescriptor> neighbors = new ArrayList<>(this.overlay.getNeighbors(node));
+
+                try
+                {
+                    Socket socket = new Socket(node.IPAddress, node.Port);
+                    TCPSender sender = new TCPSender(socket);
+
+                    MessagingNodesList message = new MessagingNodesList(neighbors.size(), neighbors);
+                    sender.sendData(message.getBytes());
+                    socket.close();
+
+                } catch (IOException ioe)
+                {
+                    System.out.println("SendMessagingNodesList: " + ioe.getMessage());
+                }
+
+            }
+        }
+
     }
 
     private void ListMessagingNodes()
@@ -323,17 +364,23 @@ public class Registry implements Node
 
     private void NodeTaskComplete(TaskComplete event)
     {
-        if (this.completedNodeList == null)
-            this.completedNodeList = new ArrayList<>();
-
-        NodeDescriptor nd = new NodeDescriptor(event.getIPAddress(), event.getPort());
-        this.completedNodeList.add(nd);
-        System.out.println("Node Task Complete: " + nd.toString());
-
-        if (this.completedNodeList.size() == this.nodeList.size())
+        if (this.nodesToSend.size() == 0)
         {
+            try
+            {
+                Thread.sleep(1000);
+            } catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
             SendPullTrafficSummaries();
+            return;
         }
+
+        NodeDescriptor nextNode = this.nodesToSend.remove(0);
+
+        SendStartConnection(nextNode, this.getRoundCount());
+
     }
 
     private void SendPullTrafficSummaries()
@@ -420,4 +467,13 @@ public class Registry implements Node
     }
 
 
+    public int getRoundCount()
+    {
+        return roundCount;
+    }
+
+    public void setRoundCount(int roundCount)
+    {
+        this.roundCount = roundCount;
+    }
 }

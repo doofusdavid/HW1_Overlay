@@ -156,6 +156,26 @@ public class Graph
         return count;
     }
 
+    /**
+     * Returns list of nodes that a node should connect to.  Not duplicated, so this will contain
+     * between connectioncount and 1 nodes.
+     *
+     * @param node
+     * @return list of nodes that a node should connect to.
+     */
+    public List<NodeDescriptor> getNeighbors(NodeDescriptor node)
+    {
+        ArrayList<NodeDescriptor> neighbors = new ArrayList<>();
+
+        for (Edge edge : edges)
+        {
+            if (edge.getSource().equals(node))
+            {
+                neighbors.add(edge.getDestination());
+            }
+        }
+        return neighbors;
+    }
     public List<Edge> getEdges()
     {
         return edges;

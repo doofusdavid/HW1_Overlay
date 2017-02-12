@@ -31,6 +31,7 @@ public class MessagingNode implements Node
     private ArrayList<Edge> edges;
     private ArrayList<NodeDescriptor> otherNodes;
     private Graph graph;
+    private ArrayList<NodeDescriptor> neighbors;
 
     // keep track of number of messages sent/receive by this node
     private int receiveTracker;
@@ -273,6 +274,17 @@ public class MessagingNode implements Node
         {
             this.PullTrafficSummary();
         }
+        if (event instanceof MessagingNodesList)
+        {
+            this.ReceiveMessagingNodesList((MessagingNodesList) event);
+        }
+    }
+
+    private void ReceiveMessagingNodesList(MessagingNodesList message)
+    {
+        this.neighbors = new ArrayList<>(message.getNeighborNodes());
+
+        System.out.println("All connections are established.  Number of connections: " + message.getNumberOfPeers());
     }
 
     private void PullTrafficSummary()
