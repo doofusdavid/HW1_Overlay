@@ -190,6 +190,9 @@ public class Registry implements Node
 
     private void StartConnections(int roundCount)
     {
+        // Clear out the list of received nodes, as we're starting again
+        this.trafficSummaryList = null;
+
         // Nodes to send is the queue of nodes
         this.nodesToSend = new ArrayList<>(this.nodeList);
 

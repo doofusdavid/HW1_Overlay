@@ -263,7 +263,7 @@ public class MessagingNode implements Node
         }
         if (event instanceof Message)
         {
-            System.out.println("Received Message\nCurrent Receipts:" + this.receiveTracker);
+            //System.out.println("Received Message\nCurrent Receipts:" + this.receiveTracker);
             this.ReceiveMessage((Message) event);
         }
         if (event instanceof TaskInitiate)
@@ -386,8 +386,6 @@ public class MessagingNode implements Node
 //            Thread t = new Thread(senderThread);
 //            t.start();
 
-            this.incrementSentCounter();
-            this.addSentSummation(message.getPayload());
             sender.sendData(message.getBytes());
             nodeSocket.close();
         } catch (IOException ioe)
@@ -407,6 +405,8 @@ public class MessagingNode implements Node
         Random random = new Random();
         int payload = random.nextInt();
         Message message = new Message(source, sinkNode, payload, nodePath);
+        this.incrementSentCounter();
+        this.addSentSummation(message.getPayload());
 
         // Send to the first item in the path list
         this.SendMessageToNode(message, nodePath.get(1));
@@ -414,13 +414,13 @@ public class MessagingNode implements Node
     }
     private void ReceiveMessage(Message event)
     {
-        this.incrementReceivedCounter();
         ArrayList<NodeDescriptor> route = event.getRoutingPath();
         NodeDescriptor me = new NodeDescriptor(0, this.hostIPAddress, this.hostPort);
         if (event.getDestination().equals(me))
         {
             // We've reached the destination!
             //System.out.println("Message received destination");
+            this.incrementReceivedCounter();
             this.addReceiveSummation(event.getPayload());
             return;
         }
