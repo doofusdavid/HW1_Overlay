@@ -5,7 +5,9 @@ import cs455.overlay.dijkstra.Edge;
 import java.io.*;
 import java.util.ArrayList;
 
-
+/**
+ * Represents the LinkWeights sent from the Registry to the MessagingNode
+ */
 public class LinkWeights implements Event
 {
     private final int type = MessageType.LINK_WEIGHTS;

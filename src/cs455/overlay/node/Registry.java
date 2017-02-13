@@ -103,8 +103,10 @@ public class Registry implements Node
                 {
                     System.out.println("Received setup-overlay with invalid parameters.  setup-overlay <number-of-connections>");
                     continue;
-                }
-                else
+                } else if (registry.nodeList.size() < 1)
+                {
+                    System.out.println("Received setup-overlay but no nodes have connected yet.");
+                } else
                 {
                     System.out.println(String.format("Received Setup Overlay command with %d connections.", connectionCount));
                     registry.SetupOverlay(connectionCount);
