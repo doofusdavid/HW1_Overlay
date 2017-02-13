@@ -6,6 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Weighted graph consisting of nodes and edges.  Used as an input to Dijkstra's
+ * algorithm, and can be rehydrated by MessagingNodes.
+ */
 public class Graph
 {
     private final List<NodeDescriptor> vertexes;
@@ -176,6 +180,7 @@ public class Graph
         }
         return neighbors;
     }
+
     public List<Edge> getEdges()
     {
         return edges;

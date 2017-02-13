@@ -3,7 +3,7 @@ package cs455.overlay.node;
 import cs455.overlay.wireformats.Event;
 
 /**
- * Created by david on 1/21/17.
+ * Interface containing the basics used by Nodes, currently Registry and MessagingNode
  */
 public interface Node
 {

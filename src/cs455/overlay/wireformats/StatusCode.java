@@ -1,7 +1,7 @@
 package cs455.overlay.wireformats;
 
 /**
- * Created by david on 1/29/17.
+ * StatusCode - List of status codes used by RegisterResponse and DeregisterResponse
  */
 public class StatusCode
 {

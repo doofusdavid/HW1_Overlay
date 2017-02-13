@@ -1,9 +1,10 @@
 package cs455.overlay.util;
 
-
+/**
+ * Parse a string command to get the value
+ */
 public class StringUtil
 {
-
     public static int getIntFromStringCommand(String command)
     {
         String[] commandArray = command.split("\\s+");

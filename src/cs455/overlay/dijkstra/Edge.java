@@ -1,5 +1,10 @@
 package cs455.overlay.dijkstra;
 
+/**
+ * Edge consists of two nodes and the weight between them.  Used in
+ * Dijkstra's Algorithm, and also sent to MessagingNodes during the
+ * startup process.  A list of edges can be used to reconstruct a Graph.
+ */
 public class Edge
 {
     private final NodeDescriptor source;

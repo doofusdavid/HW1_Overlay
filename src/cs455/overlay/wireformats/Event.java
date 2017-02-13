@@ -3,7 +3,7 @@ package cs455.overlay.wireformats;
 import java.io.IOException;
 
 /**
- * Created by david on 1/21/17.
+ * Interface containing the methods used by Events
  */
 public interface Event
 {

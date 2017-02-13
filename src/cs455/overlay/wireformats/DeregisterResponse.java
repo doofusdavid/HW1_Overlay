@@ -2,7 +2,9 @@ package cs455.overlay.wireformats;
 
 import java.io.*;
 
-
+/**
+ * DeregisterResponse - A messaging node responds to the registry with this message
+ */
 public class DeregisterResponse implements Event
 {
     private final int type = MessageType.DEREGISTER_RESPONSE;

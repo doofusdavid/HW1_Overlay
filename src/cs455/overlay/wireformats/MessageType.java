@@ -1,7 +1,7 @@
 package cs455.overlay.wireformats;
 
 /**
- * Created by david on 1/28/17.
+ * Constants containing all MessageTypes for the various Events
  */
 public class MessageType
 {

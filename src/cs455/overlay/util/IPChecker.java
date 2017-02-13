@@ -3,7 +3,7 @@ package cs455.overlay.util;
 import java.util.regex.Pattern;
 
 /**
- * Created by david on 1/29/17.
+ * Quick class to determine if a valid IP is being passed in
  */
 public class IPChecker
 {

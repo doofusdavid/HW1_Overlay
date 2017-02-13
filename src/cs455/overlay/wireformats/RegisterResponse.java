@@ -2,6 +2,10 @@ package cs455.overlay.wireformats;
 
 import java.io.*;
 
+/**
+ * RegisterResponse - Sent from Registry to MessagingNode after a MessagingNode
+ * requests registration
+ */
 public class RegisterResponse implements Event
 {
 

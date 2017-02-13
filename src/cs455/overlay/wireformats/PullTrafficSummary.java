@@ -2,7 +2,9 @@ package cs455.overlay.wireformats;
 
 import java.io.*;
 
-
+/**
+ * PullTrafficSummary - Message sent to MessagingNodes asking for statistics.
+ */
 public class PullTrafficSummary implements Event
 {
     private final int type = MessageType.PULL_TRAFFIC_SUMMARY;

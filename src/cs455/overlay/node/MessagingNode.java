@@ -16,10 +16,12 @@ import java.util.ListIterator;
 import java.util.Random;
 import java.util.Scanner;
 
+/**
+ * One of the two main classes used for HW1.  Communicates with the Registry, and when told
+ * MessagingNodes communicate with other MessagingNodes, and returns statistics to the Registry
+ */
 public class MessagingNode implements Node
 {
-    private TCPReceiverThread receiver;
-    private TCPSender sender;
     private String hostIPAddress;
     private int hostPort;
     private String registryIPAddress;
@@ -85,8 +87,7 @@ public class MessagingNode implements Node
         try
         {
             registryPort = Integer.parseInt(args[1]);
-        }
-        catch (NumberFormatException nfe)
+        } catch (NumberFormatException nfe)
         {
             System.out.println("Invalid Port Number for registry");
             return;
@@ -192,14 +193,14 @@ public class MessagingNode implements Node
             System.out.println("Registration Request Failed.  Exiting.");
             System.out.println(String.format("Message: %s", response.additionalInfo));
             System.exit(0);
-        }
-        else
+        } else
         {
             System.out.println("Registration Request Succeeded.");
             System.out.println(String.format("Message: %s", response.additionalInfo));
             this.connectedToRegistry = true;
         }
     }
+
     /**
      * Create this as synchronized so that two threads can't update the counter simultaneously.
      */
@@ -207,10 +208,12 @@ public class MessagingNode implements Node
     {
         this.sendTracker++;
     }
+
     private synchronized void incrementReceivedCounter()
     {
         this.receiveTracker++;
     }
+
     private synchronized void incrementRelayCounter()
     {
         this.relayTracker++;
@@ -220,6 +223,7 @@ public class MessagingNode implements Node
     {
         this.receiveSummation += value;
     }
+
     private synchronized void addSentSummation(int value)
     {
         this.sendSummation += value;
@@ -379,14 +383,8 @@ public class MessagingNode implements Node
     {
         try
         {
-            //System.out.println(String.format("Sending Message from %s:%d to : %s:%d", this.hostIPAddress, this.hostPort, node.IPAddress, node.Port));
-
             Socket nodeSocket = new Socket(node.IPAddress, node.Port);
             TCPSender sender = new TCPSender(nodeSocket);
-
-//            TCPSenderThread senderThread = new TCPSenderThread(node.IPAddress, node.Port, message.getBytes());
-//            Thread t = new Thread(senderThread);
-//            t.start();
 
             sender.sendData(message.getBytes());
             nodeSocket.close();
@@ -422,6 +420,7 @@ public class MessagingNode implements Node
         this.SendMessageToNode(message, nodePath.get(1));
 
     }
+
     private void ReceiveMessage(Message event)
     {
         ArrayList<NodeDescriptor> route = event.getRoutingPath();

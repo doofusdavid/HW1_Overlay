@@ -3,7 +3,8 @@ package cs455.overlay.wireformats;
 import java.io.*;
 
 /**
- * Created by david on 1/21/17.
+ * TrafficSummary - Message from MessagingNode containing all of the statistics used to
+ * create the report of traffic by Registry
  */
 public class TrafficSummary implements Event
 {

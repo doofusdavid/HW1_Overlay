@@ -2,6 +2,9 @@ package cs455.overlay.dijkstra;
 
 import java.util.*;
 
+/**
+ * Used to determine the shortest path through a weighted node graph
+ */
 public class DijkstraAlgorithm
 {
     private final List<NodeDescriptor> nodes;
@@ -19,6 +22,11 @@ public class DijkstraAlgorithm
         this.graph = graph;
     }
 
+    /**
+     * Test to make sure things are working.
+     *
+     * @param args
+     */
     public static void main(String args[])
     {
         ArrayList<NodeDescriptor> nodeList = new ArrayList<>();

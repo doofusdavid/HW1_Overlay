@@ -3,7 +3,7 @@ package cs455.overlay.wireformats;
 import java.io.*;
 
 /**
- * The registry informs nodes in the overlay when they should start sending messages to each other
+ * TaskInitiate - The registry informs nodes in the overlay when they should start sending messages to each other
  * using TaskInitiate
  */
 public class TaskInitiate implements Event
@@ -14,13 +14,6 @@ public class TaskInitiate implements Event
     public TaskInitiate()
     {
 
-    }
-
-
-    @Override
-    public int getType()
-    {
-        return this.type;
     }
 
     public TaskInitiate(byte[] marshalledBytes) throws IOException
@@ -38,6 +31,12 @@ public class TaskInitiate implements Event
 
         baInputStream.close();
         din.close();
+    }
+
+    @Override
+    public int getType()
+    {
+        return this.type;
     }
 
     @Override
