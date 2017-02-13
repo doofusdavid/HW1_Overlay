@@ -53,10 +53,7 @@ public class Edge
 
     public boolean contains(NodeDescriptor node)
     {
-        if (this.source.equals(node) || this.destination.equals(node))
-            return true;
-        else
-            return false;
+        return this.source.equals(node) || this.destination.equals(node);
     }
 
 
