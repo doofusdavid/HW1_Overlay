@@ -1,9 +1,6 @@
 package cs455.overlay.node;
 
-import cs455.overlay.dijkstra.DijkstraAlgorithm;
-import cs455.overlay.dijkstra.Edge;
-import cs455.overlay.dijkstra.Graph;
-import cs455.overlay.dijkstra.NodeDescriptor;
+import cs455.overlay.dijkstra.*;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.IPChecker;
@@ -32,6 +29,7 @@ public class MessagingNode implements Node
     private ArrayList<NodeDescriptor> otherNodes;
     private Graph graph;
     private ArrayList<NodeDescriptor> neighbors;
+    private RoutingCache routingCache;
 
     // keep track of number of messages sent/receive by this node
     private int receiveTracker;
@@ -102,6 +100,7 @@ public class MessagingNode implements Node
     private static void ProcessInput(MessagingNode node)
     {
         Scanner in = new Scanner(System.in);
+        // TODO: After a run, exit-overlay doesn't work.
         while(true)
         {
             String input = in.nextLine();
@@ -114,6 +113,7 @@ public class MessagingNode implements Node
             {
                 case "print-shortest-path":
                     System.out.println("Received Print Shortest Path command");
+                    // TODO: implement print-shortest-path
                     throw new NotImplementedException();
                     //break;
                 case "exit-overlay":
@@ -340,6 +340,8 @@ public class MessagingNode implements Node
         int rounds = event.rounds;
         Random random = new Random();
         SetOtherNodeList();
+        routingCache = new RoutingCache();
+
         for (int i = 0; i < rounds; i++)
         {
             int nodeNum = random.nextInt(this.otherNodes.size());
@@ -397,10 +399,18 @@ public class MessagingNode implements Node
 
     private void SendMessage(NodeDescriptor sinkNode)
     {
+        ArrayList<NodeDescriptor> nodePath;
         NodeDescriptor source = new NodeDescriptor(this.hostIPAddress, this.hostPort);
-        DijkstraAlgorithm da = new DijkstraAlgorithm(this.graph);
-        da.execute(source);
-        ArrayList<NodeDescriptor> nodePath = new ArrayList<>(da.getPath(sinkNode));
+
+        if (routingCache.routeExists(sinkNode))
+            nodePath = routingCache.getPath(sinkNode);
+        else
+        {
+            DijkstraAlgorithm da = new DijkstraAlgorithm(this.graph);
+            da.execute(source);
+            nodePath = new ArrayList<>(da.getPath(sinkNode));
+            routingCache.addPath(sinkNode, nodePath);
+        }
 
         Random random = new Random();
         int payload = random.nextInt();
