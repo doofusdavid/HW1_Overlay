@@ -7,12 +7,15 @@ david.edwards@colostate.edu
 - __DijkstraAlgorithm__
 
    Contains the implementation of Dijkstra's Algorithm I used to create the shortest path between MessagingNodes
+
 - __Edge__
 
    Represents an edge in the graph.  Consists of two NodeDescriptors and a weight, representing the weight of the connection.
+
 - __Graph__
 
    Implementation of the weighted graph containing nodes and edges.  Passed to Dijkstra's algorithm, and also can generate a list of Edges which are passed down to the MessagingNodes from the Registry
+
 - __NodeDescriptor__
 
    The basic node descriptor used for nodes all throughout the project.  Contains an IP address and a Port.  Used as a message component, in a weighted graph, and elsewhere.
