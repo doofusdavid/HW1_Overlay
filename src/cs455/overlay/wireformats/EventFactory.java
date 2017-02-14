@@ -8,24 +8,14 @@ import java.nio.ByteBuffer;
 
 public class EventFactory
 {
-    private static EventFactory instance;
+    private static final EventFactory instance = new EventFactory();
 
-    public EventFactory()
+    private EventFactory()
     {
     }
 
     public static EventFactory getInstance()
     {
-        if (instance == null)
-        {
-            synchronized (EventFactory.class)
-            {
-                if (instance == null)
-                {
-                    instance = new EventFactory();
-                }
-            }
-        }
         return instance;
     }
 
