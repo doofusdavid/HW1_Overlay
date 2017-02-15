@@ -1,7 +1,20 @@
 # CS455 - Intro to Distributed Systems #
-David Edwards
 
-david.edwards@colostate.edu
+__David Edwards__
+
+*david.edwards@colostate.edu*
+
+### Notes ###
+I'm hoping most things are laid out as presented in the assignment.  I may have erred on
+the side of too much output.  
+
+1. Because I'm a remote student, and 
+was unable to work in the lab, I did most of my tests on my Mac.  I verified that the code
+worked by opening 10 windows, ssh-ed into various CS computers to run the MessagingNode 
+and Registry
+2. Despite attempts, the tabs for the Traffic Summary don't line up perfectly.  My machine is
+stuck on 4 spaces per tab, the CS ones on 8.  It'd probably be preferable to output it as CSV or
+something that some other software could work with.
 
 ## cs455.dijkstra ##
 - __DijkstraAlgorithm__
@@ -63,6 +76,14 @@ david.edwards@colostate.edu
 ## cs455.wireformats ##
 
 Most wireformat classes consist of messages sent back and forth from MessagingNode to Registry, or MessagingNode to MessagingNode.
+
+- __ConnectionRequest__
+
+   When the MessagingNodesList is sent to a MessagingNode, this connection is sent to all connected nodes to establish a connection.
+
+- __ConnectionResponse__
+
+   When a ConnectionRequest is received by a neighbor node, they will send back a ConnectionResponse
 
 - __DeregisterRequest__
 
