@@ -73,7 +73,7 @@ public class MessagingNode implements Node
 
     /**
      * Main takes in an IP and Port, and creates a MessagingNode.  Then, accpepts input on the command line.
-     * @param args
+     * @param args Takes in IP address and Port of Registry
      */
     public static void main(String[] args)
     {
@@ -292,6 +292,12 @@ public class MessagingNode implements Node
         this.sendSummation = 0;
     }
 
+
+    /**
+     * Processes incoming Events, calling appropriate methods
+     *
+     * @param event Incoming Event
+     */
     @Override
     public void onEvent(Event event)
     {

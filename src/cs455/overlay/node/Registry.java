@@ -18,21 +18,23 @@ import java.util.Collections;
 import java.util.Scanner;
 
 /**
- * Created by david on 1/21/17.
+ * Registry keeps track of information about MessagingNodes, telling them about the overlay,
+ * start sending messages, and process and display the traffic summary.
  */
 public class Registry implements Node
 {
-    private TCPReceiverThread receiver;
-    private TCPSender sender;
     private int registryPort;
-    private String registryIPAddress;
     private ArrayList<NodeDescriptor> nodeList;
     private Graph overlay;
     private ArrayList<TrafficSummary> trafficSummaryList;
-    private ArrayList<NodeDescriptor> completedNodeList;
     private ArrayList<NodeDescriptor> nodesToSend;
     private int roundCount;
 
+    /**
+     * Creates a registry at the given port (on the current IP address.
+     *
+     * @param port Port to listen on.
+     */
     private Registry(int port)
     {
         this.registryPort = port;
@@ -41,7 +43,6 @@ public class Registry implements Node
         try
         {
             TCPReceiverThread receiver = new TCPReceiverThread(this.registryPort, this);
-            this.registryIPAddress = InetAddress.getLocalHost().getHostAddress();
 
             Thread t = new Thread(receiver);
             t.start();
@@ -52,6 +53,10 @@ public class Registry implements Node
         }
     }
 
+    /**
+     * Main takes in a port, instantiates a registry, and starts processing input.
+     * @param args Takes in one argument, a Port number
+     */
     public static void main(String[] args)
     {
         if(args.length != 1)
@@ -65,8 +70,7 @@ public class Registry implements Node
         try
         {
             argPort = Integer.parseInt(args[0]);
-        }
-        catch (NumberFormatException nfe)
+        } catch (NumberFormatException nfe)
         {
             System.out.println("Invalid Port Number for registry");
             return;
@@ -78,8 +82,7 @@ public class Registry implements Node
         String registryIP="";
         try{
             registryIP = InetAddress.getLocalHost().getHostAddress();
-        }
-        catch (UnknownHostException e)
+        } catch (UnknownHostException e)
         {
             System.out.println(e.getMessage());
         }
@@ -90,6 +93,10 @@ public class Registry implements Node
 
     }
 
+    /**
+     * Accepts command line commands, executes them.
+     * @param registry Reference to the Registry, used for launching methods.
+     */
     private static void ProcessInput(Registry registry)
     {
         Scanner in = new Scanner(System.in);
@@ -124,8 +131,7 @@ public class Registry implements Node
                 {
                     System.out.println("Received Start command with invalid parameters.  Please try 'start <number of rounds>");
                     continue;
-                }
-                else
+                } else
                 {
                     registry.setRoundCount(roundCount);
                     registry.StartConnections(roundCount);
@@ -259,9 +265,9 @@ public class Registry implements Node
         }
     }
 
-    public void RegisterNode(RegisterRequest request)
+    private void RegisterNode(RegisterRequest request)
     {
-        if(this.nodeList.contains(request.Port))
+        if (this.nodeList.contains(new NodeDescriptor(request.IPAddress, request.Port)))
         {
             // Node already registered, send a Failure response
             this.SendRegistrationResponse(request, StatusCode.FAILURE, "Node already registered.  No action taken");
@@ -307,7 +313,7 @@ public class Registry implements Node
         }
         if (event instanceof TaskComplete)
         {
-            NodeTaskComplete((TaskComplete) event);
+            NodeTaskComplete();
         }
         if (event instanceof TrafficSummary)
         {
@@ -367,7 +373,7 @@ public class Registry implements Node
                 RelayCountTotal));
     }
 
-    private void NodeTaskComplete(TaskComplete event)
+    private void NodeTaskComplete()
     {
         if (this.nodesToSend.size() == 0)
         {
@@ -470,12 +476,12 @@ public class Registry implements Node
     }
 
 
-    public int getRoundCount()
+    private int getRoundCount()
     {
         return roundCount;
     }
 
-    public void setRoundCount(int roundCount)
+    private void setRoundCount(int roundCount)
     {
         this.roundCount = roundCount;
     }

@@ -5,7 +5,10 @@ import cs455.overlay.dijkstra.NodeDescriptor;
 import java.io.*;
 import java.util.ArrayList;
 
-
+/**
+ * Represents the neighbors of a given node, sent from the Registry to the MessagingNodes,
+ * at which point the MessagingNodes try to contact their neighbors.
+ */
 public class MessagingNodesList implements Event
 {
     private int type = MessageType.MESSAGING_NODES_LIST;
@@ -49,11 +52,6 @@ public class MessagingNodesList implements Event
 
     }
 
-    public int getNumberOfPeers()
-    {
-        return numberOfPeers;
-    }
-
     public ArrayList<NodeDescriptor> getNeighborNodes()
     {
         return neighborNodes;
@@ -68,7 +66,7 @@ public class MessagingNodesList implements Event
     @Override
     public byte[] getBytes() throws IOException
     {
-        byte[] marshalledBytes = null;
+        byte[] marshalledBytes;
         ByteArrayOutputStream baOutputStream = new ByteArrayOutputStream();
         DataOutputStream dout = new DataOutputStream(new BufferedOutputStream(baOutputStream));
 
