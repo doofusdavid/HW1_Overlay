@@ -3,7 +3,7 @@ all: compile
 
 clean:
 	@echo -e '[INFO] Cleaning Up...'
-	@rm -rf src/cs455/**/**/*.class
+	@rm -rf cs455/**/**/*.class
 
 compile:
 	@echo -e '[INFO] Compiling...'
