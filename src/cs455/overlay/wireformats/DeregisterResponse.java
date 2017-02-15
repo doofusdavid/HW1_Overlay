@@ -3,7 +3,7 @@ package cs455.overlay.wireformats;
 import java.io.*;
 
 /**
- * DeregisterResponse - A messaging node responds to the registry with this message
+ * DeregisterResponse - The registry responds to a deregistration request with this Event.
  */
 public class DeregisterResponse implements Event
 {

@@ -146,8 +146,8 @@ public class Graph
     /**
      * Return the number of connections to/from the given node
      *
-     * @param node
-     * @return
+     * @param node node we're interested in
+     * @return connection count
      */
     public int getConnectionCount(NodeDescriptor node)
     {
@@ -164,7 +164,7 @@ public class Graph
      * Returns list of nodes that a node should connect to.  Not duplicated, so this will contain
      * between connectioncount and 1 nodes.
      *
-     * @param node
+     * @param node source node.
      * @return list of nodes that a node should connect to.
      */
     public List<NodeDescriptor> getNeighbors(NodeDescriptor node)

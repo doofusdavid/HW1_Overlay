@@ -91,7 +91,7 @@ Most wireformat classes consist of messages sent back and forth from MessagingNo
 
 - __DeregisterResponse__
 
-   A messaging node responds to the registry with this message
+   The Registry responds to the requesting MessagingNode with this Event
 
 - __Event__
 
