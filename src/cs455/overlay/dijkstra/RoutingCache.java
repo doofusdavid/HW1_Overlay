@@ -34,6 +34,26 @@ public class RoutingCache
         return cache.containsKey(node);
     }
 
+    public int cacheCount()
+    {
+        return cache.size();
+    }
+
+    /**
+     * We may need to fill the entire cache at once (if user calls print-shortest-path)
+     *
+     * @param graph
+     */
+    public void fillAll(Graph graph, NodeDescriptor node, ArrayList<NodeDescriptor> otherNodes)
+    {
+        DijkstraAlgorithm da = new DijkstraAlgorithm(graph);
+        da.execute(node);
+        for (NodeDescriptor sink : otherNodes)
+        {
+            this.addPath(sink, new ArrayList<>(da.getPath(sink)));
+        }
+    }
+
     public ArrayList<NodeDescriptor> getPath(NodeDescriptor sink)
     {
         if (!cache.containsKey(sink))

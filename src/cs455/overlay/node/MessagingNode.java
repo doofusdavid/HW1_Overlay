@@ -4,7 +4,6 @@ import cs455.overlay.dijkstra.*;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.IPChecker;
-import cs455.overlay.util.NotImplementedException;
 import cs455.overlay.util.StringUtil;
 import cs455.overlay.wireformats.*;
 
@@ -95,7 +94,7 @@ public class MessagingNode implements Node
 
         MessagingNode node = new MessagingNode(registryIPAddress, registryPort);
 
-        //ProcessInput(node);
+        ProcessInput(node);
     }
 
     private static void ProcessInput(MessagingNode node)
@@ -114,9 +113,8 @@ public class MessagingNode implements Node
             {
                 case "print-shortest-path":
                     System.out.println("Received Print Shortest Path command");
-                    // TODO: implement print-shortest-path
-                    throw new NotImplementedException();
-                    //break;
+                    node.PrintShortestPath();
+                    break;
                 case "exit-overlay":
                     System.out.println("Received Exit Overlay command");
 
@@ -131,6 +129,42 @@ public class MessagingNode implements Node
                     break;
             }
         }
+    }
+
+    private void PrintShortestPath()
+    {
+        if (edges == null || edges.size() < 1)
+        {
+            System.out.println("Overlay not yet sent over.  Can't print shortest paths");
+        } else
+        {
+            if (routingCache == null)
+            {
+                routingCache = new RoutingCache();
+            }
+            routingCache.fillAll(this.graph, new NodeDescriptor(this.hostIPAddress, this.hostPort), this.otherNodes);
+            for (NodeDescriptor sink : this.otherNodes)
+            {
+                PrintNodeShortestPath(edges, routingCache.getPath(sink));
+            }
+        }
+
+    }
+
+    private void PrintNodeShortestPath(ArrayList<Edge> edges, ArrayList<NodeDescriptor> path)
+    {
+        for (int i = 0; i < path.size() - 1; i++)
+        {
+            System.out.print(path.get(i) + "--");
+            for (Edge edge : edges)
+            {
+                if (edge.contains(path.get(i)) && edge.contains(path.get(i + 1)))
+                {
+                    System.out.print(edge.getWeight() + "--");
+                }
+            }
+        }
+        System.out.println(path.get(path.size() - 1));
     }
 
     private void TestSendToNode(String input)
@@ -343,7 +377,6 @@ public class MessagingNode implements Node
     {
         int rounds = event.rounds;
         Random random = new Random();
-        SetOtherNodeList();
         routingCache = new RoutingCache();
 
         for (int i = 0; i < rounds; i++)
@@ -458,6 +491,7 @@ public class MessagingNode implements Node
     {
         this.edges = event.nodeWeights;
         this.graph = new Graph(event.nodeWeights);
+        SetOtherNodeList();
 
         System.out.println("Link Weights received and processed.  Ready to send messages.");
         System.out.println(this.edges.toString());
