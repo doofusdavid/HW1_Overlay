@@ -8,12 +8,13 @@ import java.io.*;
 public class DeregisterResponse implements Event
 {
     private final int type = MessageType.DEREGISTER_RESPONSE;
-    public byte statusCode;
-    public String additionalInfo;
+    private byte statusCode;
+    private String additionalInfo;
 
-    public DeregisterResponse()
+    public DeregisterResponse(byte statusCode, String additionalInfo)
     {
-
+        this.statusCode = statusCode;
+        this.additionalInfo = additionalInfo;
     }
 
     public DeregisterResponse(byte[] marshalledBytes) throws IOException
@@ -41,6 +42,16 @@ public class DeregisterResponse implements Event
 
         baInputStream.close();
         din.close();
+    }
+
+    public byte getStatusCode()
+    {
+        return statusCode;
+    }
+
+    public String getAdditionalInfo()
+    {
+        return additionalInfo;
     }
 
     @Override

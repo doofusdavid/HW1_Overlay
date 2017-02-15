@@ -25,7 +25,6 @@ public class MessagingNode implements Node
     private int hostPort;
     private String registryIPAddress;
     private int registryPort;
-    private boolean connectedToRegistry;
     private ArrayList<Edge> edges;
     private ArrayList<NodeDescriptor> otherNodes;
     private Graph graph;
@@ -43,11 +42,16 @@ public class MessagingNode implements Node
     private long sendSummation;
     private long receiveSummation;
 
+    /**
+     * Constructor takes in an IP and Port, spawns a Receiver thread, then sends a registration request
+     *
+     * @param registryIPAddress IP address of the Registry
+     * @param registryPort      Port of the Registry
+     */
     private MessagingNode(String registryIPAddress, int registryPort)
     {
         this.registryIPAddress = registryIPAddress;
         this.registryPort = registryPort;
-        this.connectedToRegistry = false;
 
         try
         {
@@ -67,6 +71,10 @@ public class MessagingNode implements Node
 
     }
 
+    /**
+     * Main takes in an IP and Port, and creates a MessagingNode.  Then, accpepts input on the command line.
+     * @param args
+     */
     public static void main(String[] args)
     {
         if(args.length != 2)
@@ -102,7 +110,6 @@ public class MessagingNode implements Node
     private static void ProcessInput(MessagingNode node)
     {
         Scanner in = new Scanner(System.in);
-        // TODO: After a run, exit-overlay doesn't work.
         while(true)
         {
             String input = in.nextLine();
@@ -121,10 +128,6 @@ public class MessagingNode implements Node
                     System.out.println("Received Exit Overlay command");
 
                     node.SendExitOverlay();
-                    // Send deregistration message to registry
-                    // await response
-                    // exit and terminate process
-                    System.exit(0);
                     break;
                 default:
                     System.out.println("Unknown command.\nKnown commands are print-shortest-path and exit-overlay");
@@ -233,7 +236,6 @@ public class MessagingNode implements Node
         {
             System.out.println("Registration Request Succeeded.");
             System.out.println(String.format("Message: %s", response.additionalInfo));
-            this.connectedToRegistry = true;
         }
     }
 
@@ -297,6 +299,10 @@ public class MessagingNode implements Node
         {
             this.ReceiveRegistrationResponse((RegisterResponse) event);
         }
+        if (event instanceof DeregisterResponse)
+        {
+            this.ReceiveDeregisterResponse((DeregisterResponse) event);
+        }
         if (event instanceof LinkWeights)
         {
             this.ReceiveLinkWeights((LinkWeights) event);
@@ -325,6 +331,18 @@ public class MessagingNode implements Node
         if (event instanceof ConnectionResponse)
         {
             this.ReceiveConnectionResponse((ConnectionResponse) event);
+        }
+    }
+
+    private void ReceiveDeregisterResponse(DeregisterResponse event)
+    {
+        if (event.getStatusCode() == StatusCode.SUCCESS)
+        {
+            System.out.println("Received Deregister Response from Registry.  Exiting.");
+            System.exit(0);
+        } else
+        {
+            System.out.println("Deregister unsuccessful.");
         }
     }
 

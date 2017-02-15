@@ -418,7 +418,7 @@ public class Registry implements Node
     private void DeRegisterNode(DeregisterRequest event)
     {
         System.out.println("DeRegister Request Fired");
-        NodeDescriptor node = new NodeDescriptor(0,event.IPAddress, event.Port);
+        NodeDescriptor node = new NodeDescriptor(event.IPAddress, event.Port);
 
         if(this.nodeList.contains(node))
         {
@@ -439,9 +439,7 @@ public class Registry implements Node
             Socket socket = new Socket(event.IPAddress, event.Port);
             TCPSender sender = new TCPSender(socket);
 
-            DeregisterResponse response = new DeregisterResponse();
-            response.statusCode = status;
-            response.additionalInfo = message;
+            DeregisterResponse response = new DeregisterResponse(status, message);
 
             sender.sendData(response.getBytes());
             socket.close();
