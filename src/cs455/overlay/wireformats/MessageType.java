@@ -17,4 +17,6 @@ public class MessageType
     public static final int TASK_MESSAGE = 9;
     public static final int DEREGISTER_RESPONSE =  10;
     public static final int NODE_DESCRIPTOR = 11;
+    public static final int CONNECTION_REQUEST = 12;
+    public static final int CONNECTION_RESPONSE = 13;
 }

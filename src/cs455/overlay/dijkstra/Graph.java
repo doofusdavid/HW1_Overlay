@@ -173,7 +173,7 @@ public class Graph
 
         for (Edge edge : edges)
         {
-            if (edge.getSource().equals(node))
+            if (edge.getSource().equals(node) || edge.getDestination().equals(node))
             {
                 neighbors.add(edge.getDestination());
             }

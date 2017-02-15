@@ -81,6 +81,16 @@ public class EventFactory
                     message = new TrafficSummary(data);
                     break;
                 }
+                case MessageType.CONNECTION_REQUEST:
+                {
+                    message = new ConnectionRequest(data);
+                    break;
+                }
+                case MessageType.CONNECTION_RESPONSE:
+                {
+                    message = new ConnectionResponse(data);
+                    break;
+                }
                 default:
                     System.out.println("Event Factory: Unknown messageType.  Exiting.");
                     return;

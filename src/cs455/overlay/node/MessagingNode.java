@@ -30,7 +30,9 @@ public class MessagingNode implements Node
     private ArrayList<NodeDescriptor> otherNodes;
     private Graph graph;
     private ArrayList<NodeDescriptor> neighbors;
+    private ArrayList<NodeDescriptor> connectedNeighbors;
     private RoutingCache routingCache;
+
 
     // keep track of number of messages sent/receive by this node
     private int receiveTracker;
@@ -316,13 +318,75 @@ public class MessagingNode implements Node
         {
             this.ReceiveMessagingNodesList((MessagingNodesList) event);
         }
+        if (event instanceof ConnectionRequest)
+        {
+            this.ReceiveConnectionRequest((ConnectionRequest) event);
+        }
+        if (event instanceof ConnectionResponse)
+        {
+            this.ReceiveConnectionResponse((ConnectionResponse) event);
+        }
+    }
+
+    private void ReceiveConnectionResponse(ConnectionResponse event)
+    {
+        if (event.getStatus() == StatusCode.SUCCESS)
+        {
+            if (this.connectedNeighbors == null)
+                this.connectedNeighbors = new ArrayList<>();
+            this.connectedNeighbors.add(event.getResponseNode());
+            System.out.println("Successfully connected to MessagingNode: " + event.getResponseNode().toString());
+
+            if (this.connectedNeighbors.size() == this.neighbors.size())
+                System.out.println("All connections are established.  Number of connections: " + this.connectedNeighbors.size());
+
+        } else
+        {
+            System.out.println("Failed to connect to MessagingNode: " + event.getResponseNode().toString());
+        }
+    }
+
+    private void ReceiveConnectionRequest(ConnectionRequest event)
+    {
+        NodeDescriptor requestor = event.getSourceNode();
+
+        ConnectionResponse response = new ConnectionResponse(StatusCode.SUCCESS, new NodeDescriptor(this.hostIPAddress, this.hostPort));
+
+        try
+        {
+            Socket responseSocket = new Socket(requestor.IPAddress, requestor.Port);
+            TCPSender sender = new TCPSender(responseSocket);
+            sender.sendData(response.getBytes());
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void SendConnectionRequest(NodeDescriptor neighbor)
+    {
+        ConnectionRequest request = new ConnectionRequest(new NodeDescriptor(this.hostIPAddress, this.hostPort));
+
+        try
+        {
+            Socket neighborSocket = new Socket(neighbor.IPAddress, neighbor.Port);
+            TCPSender sender = new TCPSender(neighborSocket);
+            sender.sendData(request.getBytes());
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     private void ReceiveMessagingNodesList(MessagingNodesList message)
     {
         this.neighbors = new ArrayList<>(message.getNeighborNodes());
-
-        System.out.println("All connections are established.  Number of connections: " + message.getNumberOfPeers());
+        for (NodeDescriptor neighbor : this.neighbors)
+        {
+            SendConnectionRequest(neighbor);
+        }
     }
 
     private void PullTrafficSummary()
@@ -494,6 +558,6 @@ public class MessagingNode implements Node
         SetOtherNodeList();
 
         System.out.println("Link Weights received and processed.  Ready to send messages.");
-        System.out.println(this.edges.toString());
+        //System.out.println(this.edges.toString());
     }
 }
